@@ -83,7 +83,7 @@ export function Strategy() {
           title={generatedEmpty ? 'No option survives your hard limits' : 'Nothing to rank yet'}
           lede={
             generatedEmpty
-              ? `We checked the ${AUTHORITIES[authorityId].label} reference set, but every option was removed by a hard limit or exclusion. Your rank is still saved.`
+              ? `We checked the available ${AUTHORITIES[authorityId].label} options, but every one was removed by a hard limit or exclusion. Your profile is still saved.`
               : 'Your choice list is built from the profile you fill in: your rank, your limits, and the branches you actually want.'
           }
         />
@@ -112,14 +112,13 @@ export function Strategy() {
         lede={
           <>
             {items.length} options built from rank {profile.rank ? formatRank(profile.rank) : '-'}{' '}
-            and the limits you declared. {snapshot ? 'This locked version is read-only. ' : ''}Open any row for its decision impact: what
-            choosing that one costs and gains <em>you</em>, measured against your own
-            profile.
+            and your declared limits. {snapshot ? 'This saved version is read-only. ' : ''}
+            Select a row to understand its fit, move it, or review a warning.
           </>
         }
         actions={snapshot ? (
           <button type="button" className="btn btn--sm btn--primary" onClick={() => goTo('locked')}>
-            View locked snapshot
+            View saved list
           </button>
         ) : (
           <>
@@ -131,16 +130,6 @@ export function Strategy() {
             >
               What if?
             </button>
-            {auditStale && (
-              <button
-                type="button"
-                className="btn btn--sm"
-                onClick={reaudit}
-                disabled={busy === 'audit'}
-              >
-                {busy === 'audit' ? 'Re-auditing…' : 'Re-audit list'}
-              </button>
-            )}
           </>
         )}
       />
@@ -150,30 +139,30 @@ export function Strategy() {
           {snapshot && (
             <Banner
               tone="success"
-              title="Locked snapshot: editing is off"
+              title="Saved list: editing is off"
               action={
                 <button className="btn btn--sm btn--primary" onClick={() => goTo('locked')}>
-                  View snapshot
+                  View saved list
                 </button>
               }
             >
-              <span>Start a new round or a new profile from the locked dossier if your situation changes.</span>
+              <span>Start a new round or a new profile if your situation changes.</span>
             </Banner>
           )}
 
           {auditStale && !snapshot && (
             <Banner
               tone="stale"
-              title="These flags are one version behind"
+              title="Check your latest changes"
               live
               action={
                 <button className="btn btn--sm" onClick={reaudit} disabled={busy === 'audit'}>
-                  {busy === 'audit' ? 'Re-auditing…' : 'Re-audit now'}
+                  {busy === 'audit' ? 'Checking…' : 'Check changes'}
                 </button>
               }
             >
               <span>
-                You changed the list. Re-audit to see what your edits actually changed.
+                You changed the order. Run the checks again before moving forward.
               </span>
             </Banner>
           )}
@@ -211,18 +200,6 @@ export function Strategy() {
             </section>
           )}
 
-          <div className="tally-set" style={{ margin: auditStale ? '24px 0 18px' : '0 0 18px' }}>
-            <span className="tally" data-tone={counts.CRITICAL > 0 ? 'critical' : 'zero'}>
-              <b>{counts.CRITICAL}</b> must fix
-            </span>
-            <span className="tally" data-tone={counts.WARNING > 0 ? 'warning' : 'zero'}>
-              <b>{counts.WARNING}</b> decisions pending
-            </span>
-            <span className="tally" data-tone={counts.INFO > 0 ? 'info' : 'zero'}>
-              <b>{counts.INFO}</b> for information
-            </span>
-          </div>
-
           <div className="ledger">
             <div className="ledger__head" aria-hidden="true">
               <span>Rank</span>
@@ -245,9 +222,8 @@ export function Strategy() {
           </div>
 
           <p className="band__note" style={{ marginTop: 18, maxWidth: '62ch' }}>
-            Reach labels come from historical closing ranks and are not a guarantee. They tell
-            you how much coverage your list has: they never decide what you prefer. Source:{' '}
-            {AUTHORITIES[authorityId].datasetLabel}.
+            Reach labels use past closing ranks as guidance, not as an admission guarantee.
+            Your own preferences still decide the order.
           </p>
 
         </div>
@@ -287,24 +263,24 @@ export function Strategy() {
         <NextStep
           tone="ready"
           what="This preference order is locked"
-          why="The controls above are read-only so the visible list cannot drift away from the filed snapshot."
+          why="The controls are read-only so your saved order cannot change by accident."
         >
           <button className="btn btn--primary" onClick={() => goTo('locked')}>
-            View locked dossier
+            View saved list
           </button>
         </NextStep>
       ) : auditStale ? (
         <NextStep
           tone="wait"
-          what="Re-audit before you go further"
-          why="Your edits are in, but the verdict below them is not. One click brings them back in sync."
+          what="Check your changes before you continue"
+          why="Your edits are saved, but the warning results still belong to the previous order."
         >
           <button
             className="btn btn--primary"
             onClick={reaudit}
             disabled={busy === 'audit'}
           >
-            {busy === 'audit' ? 'Re-auditing…' : 'Re-audit now'}
+            {busy === 'audit' ? 'Checking…' : 'Check changes'}
           </button>
         </NextStep>
       ) : counts.CRITICAL > 0 ? (
@@ -334,7 +310,7 @@ export function Strategy() {
         <NextStep
           tone="ready"
           what="This list is ready to lock"
-          why="Nothing in it contradicts anything you declared. Locking saves a snapshot you can reproduce later."
+          why="Nothing conflicts with the limits or priorities you declared. Review once, then save the final order."
         >
           <button className="btn btn--primary" onClick={() => goTo('conflicts')}>
             Review and lock

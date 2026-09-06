@@ -69,7 +69,7 @@ export function ConflictCard({
       data-resolved={resolved}
       data-priority={priority}
       tabIndex={priority ? -1 : undefined}
-      aria-label={`${meta.label} conflict ${conflict.code}: ${conflict.title}`}
+      aria-label={`${meta.label} decision ${conflict.code}: ${conflict.title}`}
     >
       <header className="conflict__head">
         <div className="conflict__kicker">
@@ -215,7 +215,7 @@ export function ConflictCard({
                 Your reason
               </label>
               <span className="field__hint">
-                This is stored with your locked list so the decision stays explainable later.
+                This stays with your saved list so you can remember why you kept the tradeoff.
               </span>
               <textarea
                 id={`reason-${conflict.id}`}
@@ -229,7 +229,7 @@ export function ConflictCard({
               {reasonInvalid && (
                 <span className="field__error" role="alert">
                   <span aria-hidden="true">Field</span>
-                  Write at least {MIN_REASON} characters so the override is understandable later.
+                  Write at least {MIN_REASON} characters so this choice is clear later.
                 </span>
               )}
             </div>

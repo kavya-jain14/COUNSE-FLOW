@@ -42,11 +42,11 @@ export function ConflictInspector() {
           step={4}
           total={5}
           kicker="Conflicts"
-          title="Nothing audited yet"
-          lede="The conflict inspector opens once there is a strategy to check against your declared limits."
+          title="No list to check yet"
+          lede="Build your strategy first. CounselFlow will then compare it with your limits and priorities."
         />
         <div className="empty">
-          <p>Generate a strategy first and the audit runs automatically.</p>
+          <p>Your checks will appear here as soon as your preference list is ready.</p>
           <button className="btn btn--primary" onClick={() => goTo('profile')}>
             Build my profile
           </button>
@@ -63,7 +63,7 @@ export function ConflictInspector() {
           total={5}
           kicker="Conflicts"
           title="Your hard limits leave nothing to review"
-          lede="There is no ranked option to audit or lock. CounselFlow kept every hard rule intact instead of silently widening it."
+          lede="Every available option was removed by a hard limit or exclusion. CounselFlow did not relax any rule without asking you."
         />
         <Banner tone="warning" title="Review the profile before trying again">
           <span>Widen a limit, make it soft, or remove an exclusion, then generate a new list.</span>
@@ -71,7 +71,7 @@ export function ConflictInspector() {
         <NextStep
           tone="blocked"
           what="Adjust one hard rule"
-          why="A new generation is required because the current strategy contains no options."
+          why="Change a limit or exclusion, then build the list again."
         >
           <button className="btn btn--primary" onClick={() => goTo('profile')}>
             Review my limits
@@ -109,13 +109,13 @@ export function ConflictInspector() {
         }
         lede={
           total === 0
-            ? `Audit run #${audit.runId} over ${items.length} options found nothing that conflicts with anything you declared.`
-            : `Audit run #${audit.runId} over ${items.length} options. Work top to bottom. Critical flags and unresolved warnings must be settled before locking.`
+            ? `All ${items.length} options agree with the limits and priorities you declared.`
+            : `${items.length} options checked. Work from the first highlighted decision downward before saving the list.`
         }
         actions={
           snapshot ? (
             <button type="button" className="btn btn--sm" onClick={() => goTo('locked')}>
-              View locked snapshot
+              View saved list
             </button>
           ) : auditStale ? (
             <button
@@ -124,7 +124,7 @@ export function ConflictInspector() {
               onClick={reaudit}
               disabled={busy === 'audit'}
             >
-              {busy === 'audit' ? 'Re-auditing…' : 'Re-audit'}
+              {busy === 'audit' ? 'Checking…' : 'Check changes'}
             </button>
           ) : null
         }
@@ -174,29 +174,29 @@ export function ConflictInspector() {
       {snapshot ? (
         <Banner
           tone="success"
-          title="This is a locked decision record"
+          title="This decision record is saved"
           action={
             <button className="btn btn--sm btn--primary" onClick={() => goTo('locked')}>
-              View locked snapshot
+              View saved list
             </button>
           }
         >
-          <span>The order, audit and written reasons below are read-only.</span>
+          <span>The order, checks and written reasons below are now read-only.</span>
         </Banner>
       ) : auditStale ? (
         <Banner
           tone="stale"
-          title="Changes applied: not yet re-audited"
+          title="Your changes still need checking"
           live
           action={
             <button className="btn btn--sm btn--primary" onClick={reaudit} disabled={busy === 'audit'}>
-              {busy === 'audit' ? 'Reviewing list…' : 'Re-audit'}
+              {busy === 'audit' ? 'Checking…' : 'Check changes'}
             </button>
           }
         >
           <span>
-            The list below reflects your fixes, but the verdict does not. Re-run the audit
-            before locking.
+            The list includes your fixes, but the warnings still reflect the old order. Check
+            again before saving.
           </span>
         </Banner>
       ) : counts.CRITICAL > 0 ? (
@@ -205,8 +205,8 @@ export function ConflictInspector() {
           title={`${counts.CRITICAL} hard limit${counts.CRITICAL > 1 ? 's are' : ' is'} being broken`}
         >
           <span>
-            These cannot be acknowledged away: either the option goes, or the limit changes.
-            Everything else on this page is optional.
+            A hard limit cannot be ignored: remove the option or change the limit first.
+            Other notes can wait until this is fixed.
           </span>
         </Banner>
       ) : counts.WARNING > 0 ? (
@@ -215,7 +215,7 @@ export function ConflictInspector() {
           title={`${counts.WARNING} warning decision${counts.WARNING > 1 ? 's' : ''} required`}
         >
           <span>
-            Fix each warning or keep it with a written reason, then re-audit before locking.
+            Fix each warning or keep it with a written reason, then check the list again.
           </span>
         </Banner>
       ) : (
@@ -228,7 +228,7 @@ export function ConflictInspector() {
               onClick={lock}
               disabled={busy === 'lock'}
             >
-              {busy === 'lock' ? 'Filing strategy…' : 'Lock my list'}
+              {busy === 'lock' ? 'Saving list…' : 'Lock my list'}
             </button>
           }
         >
@@ -236,7 +236,7 @@ export function ConflictInspector() {
             {acknowledged.length > 0
               ? `${acknowledged.length} acknowledged warning${
                   acknowledged.length > 1 ? 's' : ''
-                } will be stored with your snapshot.`
+                } will be stored with your final list.`
               : 'Nothing left unresolved.'}
           </span>
         </Banner>
@@ -272,7 +272,7 @@ export function ConflictInspector() {
           <Band
             num={`${activity.length} entr${activity.length > 1 ? 'ies' : 'y'}`}
             title="What you have changed"
-            note="Every proposal, fix and override, in order. This trail is stored with the locked snapshot."
+            note="Your fixes and explained exceptions are kept with the final list."
           >
             <ul className="activity">
               {activity.map((entry) => (
@@ -293,27 +293,27 @@ export function ConflictInspector() {
       {snapshot ? (
         <NextStep
           tone="ready"
-          what="Your reviewed list is already locked"
-          why="Open the immutable snapshot to record an allotment or continue to the next counselling round."
+          what="Your reviewed list is already saved"
+          why="Open the saved list to record an allotment or continue to the next counselling round."
         >
           <button className="btn" onClick={() => goTo('strategy')}>
             View ranked list
           </button>
           <button className="btn btn--primary" onClick={() => goTo('locked')}>
-            View locked dossier
+            View saved list
           </button>
         </NextStep>
       ) : auditStale ? (
         <NextStep
           tone="wait"
-          what="Re-audit to confirm your fixes worked"
-          why="You changed things. Re-running the audit is the only way to know whether the flags are actually gone."
+          what="Check that your fixes worked"
+          why="Run the checks again to confirm the warnings are gone from the latest order."
         >
           <button className="btn" onClick={() => goTo('strategy')}>
             Back to list
           </button>
           <button className="btn btn--primary" onClick={reaudit} disabled={busy === 'audit'}>
-            {busy === 'audit' ? 'Re-auditing…' : 'Re-audit now'}
+            {busy === 'audit' ? 'Checking…' : 'Check changes'}
           </button>
         </NextStep>
       ) : counts.CRITICAL > 0 ? (
@@ -346,7 +346,7 @@ export function ConflictInspector() {
         <NextStep
           tone="ready"
           what="Lock your list"
-          why="This saves a snapshot with your order, your reasons, and the dataset version used: so the decision stays explainable later."
+          why="This saves your final order together with every fix and explained exception."
         >
           <button className="btn" onClick={() => goTo('strategy')}>
             Back to list

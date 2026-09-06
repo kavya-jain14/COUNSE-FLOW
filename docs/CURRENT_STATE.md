@@ -85,6 +85,23 @@ Last updated: 2026-09-06
   does not alter strategy, audit, lock, contract or state behavior.
 - Full design notes: `design/CALM_SCHOLAR.md`.
 
+## Candidate-language UX cleanup
+
+- The horizontal route stays swipeable on narrow screens, hides the browser scrollbar,
+  and automatically centres the current step after navigation.
+- Removed the duplicate page breadcrumb and engine/version strip. The masthead and route
+  now provide one clear location, status and next-step signal.
+- Landing copy now tells candidates what to prepare and what the tool will do; internal
+  claims such as deterministic ordering are no longer used as product benefits.
+- Profile errors move focus to the first invalid field, while authority and quota guidance
+  uses certificate and counselling language instead of dataset terminology.
+- Strategy shows one attention queue, selects the first affected option and avoids repeating
+  the same warning totals in multiple bands.
+- Conflict actions use plain candidate language and keep the first unfinished decision in
+  focus. Saved-record identifiers remain available only inside a collapsed details section.
+- Lock focuses on the real next task: record the allotted seat and decide whether the next
+  round contains genuine improvements.
+
 ## Verification
 
 - Shared-contract TypeScript build: passed.

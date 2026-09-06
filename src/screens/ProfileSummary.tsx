@@ -37,11 +37,11 @@ export function ProfileSummary() {
         step={2}
         total={5}
         kicker="Profile summary"
-        title="What we are about to run"
+        title="Review what will shape your list"
         lede={
           hardCount === 0
-            ? 'You have set no hard limits, so nothing will be removed outright: every option will be ranked instead.'
-            : `${hardCount} hard limit${hardCount > 1 ? 's' : ''} remove ineligible options before ranking. Everything else only changes the order.`
+            ? 'You set no hard limits, so every matching option can be ranked.'
+            : `${hardCount} hard limit${hardCount > 1 ? 's' : ''} can remove options. Everything else only changes their order.`
         }
         actions={
           <button type="button" className="btn btn--sm" onClick={() => goTo('profile')}>
@@ -83,7 +83,7 @@ export function ProfileSummary() {
             disabled={!valid || busy === 'generate'}
             onClick={generate}
           >
-            {busy === 'generate' ? 'Preparing strategy…' : 'Generate strategy'}
+            {busy === 'generate' ? 'Building your list…' : 'Generate strategy'}
           </button>
         </div>
       </section>
@@ -91,14 +91,14 @@ export function ProfileSummary() {
       <Band
         num="01"
         title="Candidate"
-        note="These determine which seat pools and closing ranks can apply to you."
+        note="Check your counselling, rank, category and region before continuing."
       >
         <dl className="summary-grid">
           <div className="summary-cell">
             <dt>Counselling</dt>
             <dd>
               {authority.label}
-              <small>{authority.datasetLabel}</small>
+              <small>{authority.rounds} counselling rounds supported</small>
             </dd>
           </div>
           <div className="summary-cell">
@@ -129,7 +129,7 @@ export function ProfileSummary() {
               <small>
                 {quotaLabels.length === 0
                   ? 'Only the standard category and region pools apply'
-                  : `${quotaLabels.join(' · ')}: recorded for review; the current shortlist still uses the main category and region pool unless a source row confirms the quota`}
+                  : `${quotaLabels.join(' · ')}. A quota is applied only where the selected counselling data includes it.`}
               </small>
             </dd>
           </div>
@@ -150,7 +150,7 @@ export function ProfileSummary() {
       <Band
         num="02"
         title="Hard limits"
-        note="These remove an option before ranking. Unknown evidence remains visible instead of being treated as a pass."
+        note="Anything outside a hard limit is removed before your preference order is built."
       >
         <div className="band__head">
           <span className="section-label">Can block your list</span>
@@ -221,7 +221,7 @@ export function ProfileSummary() {
         <NextStep
           tone="go"
           what="Generate my strategy"
-          why="We build the ordered list and run the first conflict audit in one pass. You can edit and re-audit as many times as you like."
+          why="Next, you will see the ranked list and any tradeoffs that need your decision. You can still edit and check it again."
         >
           <button type="button" className="btn" onClick={() => goTo('profile')}>
             Edit profile
@@ -232,7 +232,7 @@ export function ProfileSummary() {
             disabled={busy === 'generate'}
             onClick={generate}
           >
-            {busy === 'generate' ? 'Preparing strategy…' : 'Generate my strategy'}
+            {busy === 'generate' ? 'Building your list…' : 'Generate my strategy'}
           </button>
         </NextStep>
       ) : (

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Category, Domicile, RankType, SubQuota } from '../types'
 import { CATEGORIES, SUB_QUOTAS } from '../data/reference'
 import { AUTHORITY_LIST, AUTHORITIES } from '../data/authorities'
-import { DISTANCE_METHOD_NOTE, HOME_CITIES } from '../data/geo'
+import { HOME_CITIES } from '../data/geo'
 import { formatINR, formatKm } from '../lib/format'
 import {
   MAX_BUDGET,
@@ -42,7 +42,17 @@ export function BuildProfile() {
   function submit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitted(true)
-    if (errorCount === 0) goTo('summary')
+    if (errorCount === 0) {
+      goTo('summary')
+      return
+    }
+
+    const form = e.currentTarget
+    window.setTimeout(() => {
+      const firstInvalid = form.querySelector<HTMLElement>('[aria-invalid="true"]')
+      firstInvalid?.scrollIntoView({ block: 'center' })
+      firstInvalid?.focus({ preventScroll: true })
+    }, 0)
   }
 
   return (
@@ -51,8 +61,8 @@ export function BuildProfile() {
         step={1}
         total={5}
         kicker="Build my profile"
-        title="Tell us what you actually want"
-        lede="Two kinds of input live on this page. Hard limits can remove an option and block your final list. Soft preferences only change the order and the explanation attached to it."
+        title="Start with the facts that shape your list"
+        lede="Enter your counselling details first, then decide what is non-negotiable and what is only a preference. You can review everything before the list is generated."
         actions={
           <button type="button" className="btn btn--sm" onClick={loadDemoProfile}>
             Use sample candidate
@@ -75,12 +85,12 @@ export function BuildProfile() {
       <Band
         num="01 · Required"
         title="Your rank"
-        note="Eligibility and reachability are both computed from this, so it has to be exact."
+        note="Use the exact rank and seat category shown for the counselling you are filling."
       >
         <div className="grid-2 profile-core-grid">
           <Field
             label="Rank"
-            hint={`Enter the rank for ${authority.label}'s supported source: ${authority.rankTypes.join(' or ')}. Changing counselling clears this and the region field so seat pools are never carried across systems.`}
+            hint={`${authority.label} supports ${authority.rankTypes.join(' and ')} ranks. Switching counselling starts a separate rank and region selection.`}
             error={show('rank')}
             htmlFor="rank"
           >
@@ -135,7 +145,7 @@ export function BuildProfile() {
             </select>
             <span className="field__hint">
               {AUTHORITIES[authorityId].datasetLoaded
-                ? `${AUTHORITIES[authorityId].rounds} rounds · ${AUTHORITIES[authorityId].datasetLabel}`
+                ? `${AUTHORITIES[authorityId].rounds} rounds supported. Choose the counselling you are filling right now.`
                 : AUTHORITIES[authorityId].datasetNote}
             </span>
           </Field>
@@ -176,8 +186,8 @@ export function BuildProfile() {
         <fieldset className="quota-set">
           <legend className="field__label">Reservation quotas you can claim</legend>
           <span className="field__hint">
-            Optional, and you can record more than one. The current shortlist uses the main
-            category and region cutoff pool; no extra quota is assumed without a matching source row.
+            Optional. Select only the quotas you can prove with a valid certificate; otherwise
+            leave this blank.
           </span>
           <div className="quota-grid">
             {availableQuotas.map((quota) => {
@@ -219,7 +229,7 @@ export function BuildProfile() {
       </Band>
 
       <Band
-        num="03 · Has defaults"
+        num="03 · You can adjust"
         title="Your limits"
         note="You decide whether each of these blocks an option outright, or only ranks it lower."
       >
@@ -244,7 +254,7 @@ export function BuildProfile() {
 
         <Field
           label="Home city"
-          hint="Every distance in your list is measured from here, so the distance limit below only means something once this is set."
+          hint="We use this city to estimate how far each college is from home."
           error={show('homeCity')}
           htmlFor="homeCity"
         >
@@ -262,7 +272,6 @@ export function BuildProfile() {
               </option>
             ))}
           </select>
-          <span className="field__hint">{DISTANCE_METHOD_NOTE}</span>
         </Field>
 
         <ConstraintControl
@@ -287,7 +296,7 @@ export function BuildProfile() {
       </Band>
 
       <Band
-        num="04 · Has defaults"
+        num="04 · You can adjust"
         title="Your preferences"
         note="Soft only. These decide which of two acceptable options sits higher: they never remove anything."
       >

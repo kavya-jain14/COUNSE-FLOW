@@ -10,7 +10,6 @@ import { Strategy } from './screens/Strategy'
 import { ConflictInspector } from './screens/ConflictInspector'
 import { Locked } from './screens/Locked'
 import { isProfileValid } from './lib/validation'
-import { ENGINE_VERSION } from './data/reference'
 
 function Screen({ step }: { step: Step }) {
   switch (step) {
@@ -33,10 +32,17 @@ function Shell() {
   const state = useAppState()
   const { goTo, lock } = useAppActions()
   const mainRef = useRef<HTMLDivElement>(null)
+  const workflowRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
     mainRef.current?.focus({ preventScroll: true })
+    const frame = window.requestAnimationFrame(() => {
+      workflowRef.current
+        ?.querySelector<HTMLElement>('[aria-current="step"]')
+        ?.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' })
+    })
+    return () => window.cancelAnimationFrame(frame)
   }, [state.step])
 
   const profileReady = isProfileValid(state.profile)
@@ -63,16 +69,16 @@ function Shell() {
       ? counts.CRITICAL > 0
         ? `${counts.CRITICAL} must be fixed`
         : state.auditStale
-          ? 'Re-audit pending'
+          ? 'Check your latest changes'
           : counts.WARNING > 0
             ? `${counts.WARNING} decision${counts.WARNING > 1 ? 's' : ''} pending`
-            : 'Review complete'
-      : 'Opens after the first audit',
+            : 'All checks complete'
+      : 'Opens after your list is built',
     locked: state.lock
-      ? 'Snapshot saved'
+      ? 'Final list saved'
       : counts.CRITICAL + counts.WARNING > 0
-        ? 'Resolve required decisions'
-        : 'Ready after review',
+        ? 'Finish required decisions'
+        : 'Ready after checks',
   }
 
   const currentIndex = FLOW.findIndex((f) => f.step === state.step)
@@ -81,16 +87,16 @@ function Shell() {
   const showLockAction =
     !state.lock && Boolean(state.audit) && (state.step === 'strategy' || state.step === 'conflicts')
   const status = state.lock
-    ? 'FILED'
+    ? 'LOCKED'
     : state.auditStale
-      ? 'REVIEW DUE'
+      ? 'CHECK AGAIN'
       : counts.CRITICAL + counts.WARNING > 0
         ? 'ACTION NEEDED'
         : state.audit
-          ? 'AUDIT CLEAR'
+          ? 'READY TO LOCK'
           : profileReady
             ? 'PROFILE READY'
-            : 'WORKING COPY'
+            : 'IN PROGRESS'
   const activeLabel = FLOW.find((f) => f.step === state.step)?.label ?? 'Overview'
 
   return (
@@ -104,7 +110,7 @@ function Shell() {
           <button
             className="brand"
             onClick={() => goTo(state.lock ? 'locked' : 'landing')}
-            aria-label={state.lock ? 'CounselFlow locked snapshot' : 'CounselFlow home'}
+            aria-label={state.lock ? 'CounselFlow saved list' : 'CounselFlow home'}
           >
             <span className="brand__mark" aria-hidden="true">
               <img src="/brand/counselflow-mark.svg" alt="" />
@@ -142,7 +148,7 @@ function Shell() {
             <span className="mono">YOUR ROUTE</span>
             <small>{state.step === 'landing' ? 'Start with your candidate profile' : activeLabel}</small>
           </div>
-          <nav className="workflow-nav" aria-label="Counselling flow">
+          <nav className="workflow-nav" aria-label="Counselling flow" ref={workflowRef}>
             {FLOW.map((entry, i) => {
               const isCurrent = entry.step === state.step
               const isDone = currentIndex >= 0 && i < currentIndex
@@ -175,21 +181,6 @@ function Shell() {
       </header>
 
       <div className="shell__body">
-        <header className="topbar">
-          <div className="topbar__document">
-            <span className="topbar__section mono">ADMISSIONS STRATEGY FILE</span>
-            <nav className="crumb" aria-label="Breadcrumb">
-              <span>CounselFlow</span>
-              <span aria-hidden="true">/</span>
-              <strong>{activeLabel}</strong>
-            </nav>
-          </div>
-          <div className="topbar__method">
-            <span>Deterministic ordering</span>
-            <strong className="mono">{ENGINE_VERSION}</strong>
-          </div>
-        </header>
-
         <main className="main" id="main" tabIndex={-1} ref={mainRef}>
           {state.error && (
             <Banner tone="critical" title="The last operation was rejected" live>

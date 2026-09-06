@@ -69,8 +69,8 @@ export function WhatIfPanel({
   return (
     <Dialog title="What if you changed one thing?" onClose={onClose}>
       <p className="card__hint">
-        Nothing here touches your saved profile until you apply it. The same engine that built
-        your list rebuilds it here.
+        Nothing changes until you apply it. Use this preview to compare the new order with your
+        current list.
       </p>
 
       <div className="whatif__levers" role="tablist" aria-label="Preference to test">

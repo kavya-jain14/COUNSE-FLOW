@@ -39,7 +39,10 @@ the data face with tabular numerals.
 - The strategy explanation sits in a marginalia column.
 - Conflict decisions read as a case file: finding, evidence, choices, recorded outcome.
 - On smaller screens the route remains horizontally scrollable, while the working content
-  keeps the full viewport width.
+  keeps the full viewport width. Its visual scrollbar is hidden and the current step is
+  automatically centred after navigation.
+- Candidate-facing pages show one primary status and next action. Engine, revision and
+  dataset identifiers are reserved for a collapsed saved-record details section.
 
 ## Explicit exclusions
 
@@ -58,6 +61,8 @@ the visual layer.
 - Loading states use plain status copy instead of a spinner or skeleton surface.
 - The landing page contains a real seven-row product specimen with two reproducible audit
   findings.
+- Form submission focuses the first invalid field; list and conflict screens bring the first
+  unresolved decision into the candidate's path without requiring a manual search.
 - Privacy and terms links open complete, deployable notices using the same palette and type
   system.
 - Brand SVGs remain monochrome and use the approved Registrar Desk palette.
