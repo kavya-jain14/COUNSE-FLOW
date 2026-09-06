@@ -99,69 +99,80 @@ function Shell() {
         Skip to main content
       </a>
 
-      <aside className="sidebar">
-        <div className="sidebar__masthead">
+      <header className="workspace-header">
+        <div className="workspace-header__masthead">
           <button
             className="brand"
             onClick={() => goTo(state.lock ? 'locked' : 'landing')}
             aria-label={state.lock ? 'CounselFlow locked snapshot' : 'CounselFlow home'}
           >
             <span className="brand__mark" aria-hidden="true">
-              <img src="/brand/counselflow-mark-light.svg" alt="" />
+              <img src="/brand/counselflow-mark.svg" alt="" />
             </span>
             <span>
               CounselFlow
-              <small>Candidate preference dossier</small>
+              <small>Choice strategy workspace</small>
             </span>
           </button>
-          <span className="document-ref mono">
-            <span>CF / MULTI-COUNSELLING / 2026</span>
-            <small>UPTAC · JoSAA · IPU</small>
-          </span>
-        </div>
-
-        <span className="sidebar__title" aria-hidden="true">
-          Your five steps
-        </span>
-
-        <nav className="sidebar__nav" aria-label="Counselling flow">
-          {FLOW.map((entry, i) => {
-            const isCurrent = entry.step === state.step
-            const isDone = currentIndex >= 0 && i < currentIndex
-            const enabled = reachable.includes(entry.step)
-            return (
+          <div className="workspace-header__context">
+            <span className="workspace-header__eyebrow mono">ADMISSIONS CYCLE 2026</span>
+            <strong>UPTAC / JoSAA / IPU</strong>
+            <small>One preference strategy, three counselling systems</small>
+          </div>
+          <div className="workspace-header__actions">
+            {showLockAction && (
               <button
-                key={entry.step}
                 type="button"
-                className="navitem"
-                data-state={isDone ? 'done' : isCurrent ? 'current' : 'todo'}
-                aria-current={isCurrent ? 'page' : undefined}
-                disabled={!enabled && !isCurrent}
-                onClick={() => goTo(entry.step)}
+                className="btn btn--sm"
+                disabled={!canLock || state.busy === 'lock'}
+                onClick={lock}
               >
-                <span className="navitem__step" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="navitem__text">
-                  <span className="navitem__label">{entry.short}</span>
-                  <span className="navitem__meta">{meta[entry.step]}</span>
-                </span>
-                <span className="navitem__state" aria-hidden="true">
-                  {isCurrent ? 'Open' : isDone ? 'Filed' : enabled ? 'Ready' : 'Pending'}
-                </span>
+                {canLock ? 'Lock strategy' : 'Resolve before locking'}
               </button>
-            )
-          })}
-        </nav>
-
-        <div className="sidebar__foot">
-          <span>
-            <b>Method</b>
-            Deterministic ordering
-          </span>
-          <span className="mono">{ENGINE_VERSION}</span>
+            )}
+            <span className="workspace-status mono" aria-label="Current strategy status">
+              <span aria-hidden="true" />
+              {status}
+            </span>
+          </div>
         </div>
-      </aside>
+
+        <div className="workflow-ledger">
+          <div className="workflow-ledger__intro">
+            <span className="mono">YOUR ROUTE</span>
+            <small>{state.step === 'landing' ? 'Start with your candidate profile' : activeLabel}</small>
+          </div>
+          <nav className="workflow-nav" aria-label="Counselling flow">
+            {FLOW.map((entry, i) => {
+              const isCurrent = entry.step === state.step
+              const isDone = currentIndex >= 0 && i < currentIndex
+              const enabled = reachable.includes(entry.step)
+              return (
+                <button
+                  key={entry.step}
+                  type="button"
+                  className="workflow-step"
+                  data-state={isDone ? 'done' : isCurrent ? 'current' : 'todo'}
+                  aria-current={isCurrent ? 'step' : undefined}
+                  disabled={!enabled && !isCurrent}
+                  onClick={() => goTo(entry.step)}
+                >
+                  <span className="workflow-step__number mono" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="workflow-step__copy">
+                    <strong>{entry.short}</strong>
+                    <small>{meta[entry.step]}</small>
+                  </span>
+                  <span className="workflow-step__state mono" aria-hidden="true">
+                    {isCurrent ? 'NOW' : isDone ? 'DONE' : enabled ? 'READY' : 'LATER'}
+                  </span>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+      </header>
 
       <div className="shell__body">
         <header className="topbar">
@@ -173,20 +184,9 @@ function Shell() {
               <strong>{activeLabel}</strong>
             </nav>
           </div>
-          <div className="row" style={{ gap: 12, flexWrap: 'nowrap' }}>
-            {showLockAction && (
-              <button
-                type="button"
-                className="btn btn--sm"
-                disabled={!canLock || state.busy === 'lock'}
-                onClick={lock}
-              >
-                {canLock ? 'Lock strategy' : 'Resolve before locking'}
-              </button>
-            )}
-            <span className="topbar__status mono" aria-label="Current strategy status">
-              {status}
-            </span>
+          <div className="topbar__method">
+            <span>Deterministic ordering</span>
+            <strong className="mono">{ENGINE_VERSION}</strong>
           </div>
         </header>
 

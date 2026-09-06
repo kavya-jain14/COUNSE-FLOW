@@ -1,6 +1,6 @@
 # Current state
 
-Last updated: 2026-09-05
+Last updated: 2026-09-06
 
 ## Repository
 
@@ -61,14 +61,16 @@ Last updated: 2026-09-05
 - The previously standalone mock-engine test now runs under Vitest, and the root `check`
   command includes all application tests.
 
-## Calm Scholar UI checkpoint
+## Registrar Desk UI checkpoint
 
-- Replaced the dark SaaS skin with a document-driven admissions dossier system.
-- Palette is limited to soft sky blue, deep navy, warm paper, crisp off-white and beige.
-- Libre Baskerville is the display face, IBM Plex Sans is the body face and IBM Plex Mono
-  is used for rank, fees, distance, codes and revisions.
-- The five-step sidebar is now a numbered document index with no icon library or decorative
-  completion marks.
+- Replaced the fixed left sidebar with a full-width case-file masthead and horizontal
+  five-step route, returning the full viewport width to the candidate's work.
+- Palette now uses registrar ink, muted petrol, cool docket, warm paper and archive beige;
+  sky blue no longer fills the complete application frame.
+- Alegreya is the display face, Alegreya Sans is the body face and Azeret Mono is used for
+  rank, fees, distance, codes and revisions.
+- Current, completed, ready and future route states are written into each horizontal step;
+  no icon library or decorative completion marks are used.
 - Profile sections use ruled form bands; strategy and lock use flat registers; explanation
   content is marginalia; conflict decisions read as audit records.
 - Added a real landing specimen derived from the golden demo profile: seven surviving
@@ -79,8 +81,8 @@ Last updated: 2026-09-05
   decorative reorder arrows.
 - Added deployable privacy and terms notices linked from the landing document footer.
 - Updated every active brand asset to the Calm Scholar palette and typography.
-- The visual redesign remains isolated in `src/styles/calm-scholar.css`; this quality pass
-  changes only the state, audit and UX behavior described above.
+- The visual redesign remains isolated in `src/styles/calm-scholar.css`; the shell change
+  does not alter strategy, audit, lock, contract or state behavior.
 - Full design notes: `design/CALM_SCHOLAR.md`.
 
 ## Verification
