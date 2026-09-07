@@ -43,6 +43,14 @@ the data face with tabular numerals.
   automatically centred after navigation.
 - Candidate-facing pages show one primary status and next action. Engine, revision and
   dataset identifiers are reserved for a collapsed saved-record details section.
+- Selects use a shared listbox with explicit `SELECT` / `CLOSE` labels, keyboard navigation
+  and touch-sized options. Native browser chrome is not part of the active interface.
+- Range controls show a solid ink-filled track and square double-rule thumb without using
+  gradients. Quota checkboxes use a matching square ink mark.
+- Branch order is directly draggable on pointer and touch devices, while the same grip
+  supports arrow, Home and End keys.
+- Conflict records lead with a two-part current/suggested comparison; verbose evidence is
+  disclosed only on request.
 
 ## Explicit exclusions
 

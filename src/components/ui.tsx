@@ -2,6 +2,7 @@ import {
   useEffect,
   useId,
   useRef,
+  type CSSProperties,
   type ReactNode,
 } from 'react'
 import type { Severity, Tier } from '../types'
@@ -157,6 +158,51 @@ export function Field({
         </span>
       )}
     </div>
+  )
+}
+
+export function RangeInput({
+  id,
+  min,
+  max,
+  step,
+  value,
+  onChange,
+  ariaDescribedBy,
+  ariaValueText,
+}: {
+  id?: string
+  min: number
+  max: number
+  step: number
+  value: number
+  onChange: (value: number) => void
+  ariaDescribedBy?: string
+  ariaValueText?: string
+}) {
+  const progress = max === min ? 0 : ((value - min) / (max - min)) * 100
+  const style = {
+    '--range-progress': `${Math.max(0, Math.min(100, progress))}%`,
+  } as CSSProperties
+
+  return (
+    <span className="range-control" style={style}>
+      <span className="range-control__track" aria-hidden="true">
+        <span className="range-control__fill" />
+      </span>
+      <input
+        id={id}
+        className="range-control__input"
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        aria-describedby={ariaDescribedBy}
+        aria-valuetext={ariaValueText}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </span>
   )
 }
 

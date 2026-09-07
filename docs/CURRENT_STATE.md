@@ -1,6 +1,6 @@
 # Current state
 
-Last updated: 2026-09-06
+Last updated: 2026-09-07
 
 ## Repository
 
@@ -101,6 +101,17 @@ Last updated: 2026-09-06
   focus. Saved-record identifiers remain available only inside a collapsed details section.
 - Lock focuses on the real next task: record the allotted seat and decide whether the next
   round contains genuine improvements.
+- Native selects are replaced by one controlled keyboard and touch listbox across profile,
+  exclusions, branch add, What If and allotment flows.
+- Reservation checkboxes and range controls now use the same square registrar geometry,
+  ink contrast and focus treatment as the rest of the product.
+- Branch priority supports direct pointer/touch dragging plus Home, End and arrow-key
+  reordering. A single Remove action remains available without repeated Up/Down controls.
+- Conflict cards show the affected order and suggested result side by side. Detailed source
+  facts stay collapsed until a candidate asks for them.
+- Page and inspector scrolling remain functional while their native scrollbar indicators
+  are hidden. The desktop inspector remains sticky and independently scrollable; it stacks
+  below the list on narrower screens.
 
 ## Verification
 

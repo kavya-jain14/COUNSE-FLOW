@@ -5,6 +5,7 @@ import { improvementsOver, labelFor } from '../lib/rounds'
 import { formatINRExact, formatKm } from '../lib/format'
 import { Band, Banner, NextStep, PageHead, TierBadge } from '../components/ui'
 import { DecisionImpactModal } from '../features/decision-impact'
+import { SelectMenu } from '../components/SelectMenu'
 
 export function Locked() {
   const { lock, items, resolutions, profile, authorityId, currentRound, allottedOptionId, history } =
@@ -214,19 +215,18 @@ export function Locked() {
             <label className="field__label" htmlFor="allotment">
               Seat allotted in round {currentRound}
             </label>
-            <select
+            <SelectMenu
               id="allotment"
-              className="select"
               value={allottedOptionId ?? ''}
-              onChange={(e) => recordAllotment(e.target.value || null)}
-            >
-              <option value="">Not allotted anything yet</option>
-              {items.map((item) => (
-                <option key={item.itemId} value={item.option.id}>
-                  #{String(item.position).padStart(2, '0')}: {labelFor(item)}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: 'Not allotted anything yet' },
+                ...items.map((item) => ({
+                  value: item.option.id,
+                  label: `#${String(item.position).padStart(2, '0')}: ${labelFor(item)}`,
+                })),
+              ]}
+              onChange={(next) => recordAllotment(next || null)}
+            />
           </div>
 
           {heldItem && (

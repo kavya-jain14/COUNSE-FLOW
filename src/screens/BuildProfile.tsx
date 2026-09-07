@@ -17,6 +17,7 @@ import { ConstraintControl } from '../components/ConstraintControl'
 import { ExclusionPicker } from '../components/ExclusionPicker'
 import { FactorWeightSliders } from '../components/FactorWeights'
 import { Band, Banner, Field, HardSoftBadge, NextStep, PageHead } from '../components/ui'
+import { SelectMenu } from '../components/SelectMenu'
 
 const RANK_TYPES: Array<{ value: RankType; label: string }> = [
   { value: 'CRL', label: 'Common rank' },
@@ -131,18 +132,15 @@ export function BuildProfile() {
           </Field>
 
           <Field label="Counselling" htmlFor="authority">
-            <select
+            <SelectMenu
               id="authority"
-              className="select"
               value={authorityId}
-              onChange={(e) => setAuthority(e.target.value as typeof authorityId)}
-            >
-              {AUTHORITY_LIST.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.label}: {a.fullName}
-                </option>
-              ))}
-            </select>
+              options={AUTHORITY_LIST.map((entry) => ({
+                value: entry.id,
+                label: `${entry.label}: ${entry.fullName}`,
+              }))}
+              onChange={(next) => setAuthority(next as typeof authorityId)}
+            />
             <span className="field__hint">
               {AUTHORITIES[authorityId].datasetLoaded
                 ? `${AUTHORITIES[authorityId].rounds} rounds supported. Choose the counselling you are filling right now.`
@@ -151,34 +149,37 @@ export function BuildProfile() {
           </Field>
 
           <Field label="Category" error={show('category')} htmlFor="category">
-            <select
+            <SelectMenu
               id="category"
-              className="select"
               value={profile.category ?? ''}
-              aria-invalid={Boolean(show('category'))}
-              onChange={(e) => patchProfile({ category: (e.target.value || null) as Category })}
-            >
-              <option value="">Select your category…</option>
-              {availableCategories.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              invalid={Boolean(show('category'))}
+              options={[
+                { value: '', label: 'Select your category…' },
+                ...availableCategories.map((entry) => ({
+                  value: entry.value,
+                  label: entry.label,
+                })),
+              ]}
+              onChange={(next) =>
+                patchProfile({ category: next ? (next as Category) : null })
+              }
+            />
           </Field>
 
           <Field label={authority.region.label} error={show('domicile')} htmlFor="domicile">
-            <select
+            <SelectMenu
               id="domicile"
-              className="select"
               value={profile.domicile ?? ''}
-              aria-invalid={Boolean(show('domicile'))}
-              onChange={(e) => patchProfile({ domicile: (e.target.value || null) as Domicile })}
-            >
-              <option value="">Select your domicile…</option>
-              <option value="UP">{authority.region.home}</option>
-              <option value="OTHER">{authority.region.other}</option>
-            </select>
+              invalid={Boolean(show('domicile'))}
+              options={[
+                { value: '', label: `Select ${authority.region.label.toLowerCase()}…` },
+                { value: 'UP', label: authority.region.home },
+                { value: 'OTHER', label: authority.region.other },
+              ]}
+              onChange={(next) =>
+                patchProfile({ domicile: next ? (next as Domicile) : null })
+              }
+            />
             <span className="field__hint">{authority.region.hint}</span>
           </Field>
         </div>
@@ -258,20 +259,16 @@ export function BuildProfile() {
           error={show('homeCity')}
           htmlFor="homeCity"
         >
-          <select
+          <SelectMenu
             id="homeCity"
-            className="select"
             value={profile.homeCity ?? ''}
-            aria-invalid={Boolean(show('homeCity'))}
-            onChange={(e) => patchProfile({ homeCity: e.target.value || null })}
-          >
-            <option value="">Select your home city…</option>
-            {HOME_CITIES.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
+            invalid={Boolean(show('homeCity'))}
+            options={[
+              { value: '', label: 'Select your home city…' },
+              ...HOME_CITIES.map((city) => ({ value: city, label: city })),
+            ]}
+            onChange={(next) => patchProfile({ homeCity: next || null })}
+          />
         </Field>
 
         <ConstraintControl
