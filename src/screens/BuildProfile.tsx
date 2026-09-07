@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Category, Domicile, RankType, SubQuota } from '../types'
 import { CATEGORIES, SUB_QUOTAS } from '../data/reference'
 import { AUTHORITY_LIST, AUTHORITIES } from '../data/authorities'
-import { DISTANCE_METHOD_NOTE, HOME_CITIES } from '../data/geo'
+import { HOME_CITIES } from '../data/geo'
 import { formatINR, formatKm } from '../lib/format'
 import {
   MAX_BUDGET,
@@ -17,6 +17,7 @@ import { ConstraintControl } from '../components/ConstraintControl'
 import { ExclusionPicker } from '../components/ExclusionPicker'
 import { FactorWeightSliders } from '../components/FactorWeights'
 import { Band, Banner, Field, HardSoftBadge, NextStep, PageHead } from '../components/ui'
+import { SelectMenu } from '../components/SelectMenu'
 
 const RANK_TYPES: Array<{ value: RankType; label: string }> = [
   { value: 'CRL', label: 'Common rank' },
@@ -42,7 +43,17 @@ export function BuildProfile() {
   function submit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitted(true)
-    if (errorCount === 0) goTo('summary')
+    if (errorCount === 0) {
+      goTo('summary')
+      return
+    }
+
+    const form = e.currentTarget
+    window.setTimeout(() => {
+      const firstInvalid = form.querySelector<HTMLElement>('[aria-invalid="true"]')
+      firstInvalid?.scrollIntoView({ block: 'center' })
+      firstInvalid?.focus({ preventScroll: true })
+    }, 0)
   }
 
   return (
@@ -51,8 +62,8 @@ export function BuildProfile() {
         step={1}
         total={5}
         kicker="Build my profile"
-        title="Tell us what you actually want"
-        lede="Two kinds of input live on this page. Hard limits can remove an option and block your final list. Soft preferences only change the order and the explanation attached to it."
+        title="Start with the facts that shape your list"
+        lede="Enter your counselling details first, then decide what is non-negotiable and what is only a preference. You can review everything before the list is generated."
         actions={
           <button type="button" className="btn btn--sm" onClick={loadDemoProfile}>
             Use sample candidate
@@ -75,10 +86,15 @@ export function BuildProfile() {
       <Band
         num="01 · Required"
         title="Your rank"
-        note="Eligibility and reachability are both computed from this, so it has to be exact."
+        note="Use the exact rank and seat category shown for the counselling you are filling."
       >
         <div className="grid-2 profile-core-grid">
-          <Field label="Rank" error={show('rank')} htmlFor="rank">
+          <Field
+            label="Rank"
+            hint={`${authority.label} supports ${authority.rankTypes.join(' and ')} ranks. Switching counselling starts a separate rank and region selection.`}
+            error={show('rank')}
+            htmlFor="rank"
+          >
             <input
               id="rank"
               className="input"
@@ -116,54 +132,54 @@ export function BuildProfile() {
           </Field>
 
           <Field label="Counselling" htmlFor="authority">
-            <select
+            <SelectMenu
               id="authority"
-              className="select"
               value={authorityId}
-              onChange={(e) => setAuthority(e.target.value as typeof authorityId)}
-            >
-              {AUTHORITY_LIST.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.label}: {a.fullName}
-                </option>
-              ))}
-            </select>
+              options={AUTHORITY_LIST.map((entry) => ({
+                value: entry.id,
+                label: `${entry.label}: ${entry.fullName}`,
+              }))}
+              onChange={(next) => setAuthority(next as typeof authorityId)}
+            />
             <span className="field__hint">
               {AUTHORITIES[authorityId].datasetLoaded
-                ? `${AUTHORITIES[authorityId].rounds} rounds · ${AUTHORITIES[authorityId].datasetLabel}`
+                ? `${AUTHORITIES[authorityId].rounds} rounds supported. Choose the counselling you are filling right now.`
                 : AUTHORITIES[authorityId].datasetNote}
             </span>
           </Field>
 
           <Field label="Category" error={show('category')} htmlFor="category">
-            <select
+            <SelectMenu
               id="category"
-              className="select"
               value={profile.category ?? ''}
-              aria-invalid={Boolean(show('category'))}
-              onChange={(e) => patchProfile({ category: (e.target.value || null) as Category })}
-            >
-              <option value="">Select your category…</option>
-              {availableCategories.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              invalid={Boolean(show('category'))}
+              options={[
+                { value: '', label: 'Select your category…' },
+                ...availableCategories.map((entry) => ({
+                  value: entry.value,
+                  label: entry.label,
+                })),
+              ]}
+              onChange={(next) =>
+                patchProfile({ category: next ? (next as Category) : null })
+              }
+            />
           </Field>
 
           <Field label={authority.region.label} error={show('domicile')} htmlFor="domicile">
-            <select
+            <SelectMenu
               id="domicile"
-              className="select"
               value={profile.domicile ?? ''}
-              aria-invalid={Boolean(show('domicile'))}
-              onChange={(e) => patchProfile({ domicile: (e.target.value || null) as Domicile })}
-            >
-              <option value="">Select your domicile…</option>
-              <option value="UP">{authority.region.home}</option>
-              <option value="OTHER">{authority.region.other}</option>
-            </select>
+              invalid={Boolean(show('domicile'))}
+              options={[
+                { value: '', label: `Select ${authority.region.label.toLowerCase()}…` },
+                { value: 'UP', label: authority.region.home },
+                { value: 'OTHER', label: authority.region.other },
+              ]}
+              onChange={(next) =>
+                patchProfile({ domicile: next ? (next as Domicile) : null })
+              }
+            />
             <span className="field__hint">{authority.region.hint}</span>
           </Field>
         </div>
@@ -171,8 +187,8 @@ export function BuildProfile() {
         <fieldset className="quota-set">
           <legend className="field__label">Reservation quotas you can claim</legend>
           <span className="field__hint">
-            Optional, and you can claim more than one. These open extra seat pools: they never
-            remove an option from your list.
+            Optional. Select only the quotas you can prove with a valid certificate; otherwise
+            leave this blank.
           </span>
           <div className="quota-grid">
             {availableQuotas.map((quota) => {
@@ -214,7 +230,7 @@ export function BuildProfile() {
       </Band>
 
       <Band
-        num="03 · Has defaults"
+        num="03 · You can adjust"
         title="Your limits"
         note="You decide whether each of these blocks an option outright, or only ranks it lower."
       >
@@ -232,32 +248,27 @@ export function BuildProfile() {
           step={5000}
           format={formatINR}
           error={show('budget')}
-          hardBehaviour="Any option above this is removed and flagged critical. Your list will not lock until it is resolved."
+          hardBehaviour="Any option above this is removed before ranking. If you later relax this limit, the regenerated list makes that change explicit."
           softBehaviour="Options above this stay on your list but rank lower, and we explain the cost in the reason."
           onChange={(budget) => patchProfile({ budget })}
         />
 
         <Field
           label="Home city"
-          hint="Every distance in your list is measured from here, so the distance limit below only means something once this is set."
+          hint="We use this city to estimate how far each college is from home."
           error={show('homeCity')}
           htmlFor="homeCity"
         >
-          <select
+          <SelectMenu
             id="homeCity"
-            className="select"
             value={profile.homeCity ?? ''}
-            aria-invalid={Boolean(show('homeCity'))}
-            onChange={(e) => patchProfile({ homeCity: e.target.value || null })}
-          >
-            <option value="">Select your home city…</option>
-            {HOME_CITIES.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-          <span className="field__hint">{DISTANCE_METHOD_NOTE}</span>
+            invalid={Boolean(show('homeCity'))}
+            options={[
+              { value: '', label: 'Select your home city…' },
+              ...HOME_CITIES.map((city) => ({ value: city, label: city })),
+            ]}
+            onChange={(next) => patchProfile({ homeCity: next || null })}
+          />
         </Field>
 
         <ConstraintControl
@@ -269,7 +280,7 @@ export function BuildProfile() {
           step={10}
           format={formatKm}
           error={show('distance')}
-          hardBehaviour="Anything further than this is removed and flagged critical. Your list will not lock until it is resolved."
+          hardBehaviour="Anything further than this is removed before ranking. Unknown distances stay visible as an evidence gap rather than being guessed."
           softBehaviour="Further colleges stay on your list but rank lower if you weighted location."
           onChange={(distance) => patchProfile({ distance })}
         />
@@ -282,7 +293,7 @@ export function BuildProfile() {
       </Band>
 
       <Band
-        num="04 · Has defaults"
+        num="04 · You can adjust"
         title="Your preferences"
         note="Soft only. These decide which of two acceptable options sits higher: they never remove anything."
       >

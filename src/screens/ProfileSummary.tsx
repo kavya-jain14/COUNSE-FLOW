@@ -37,11 +37,11 @@ export function ProfileSummary() {
         step={2}
         total={5}
         kicker="Profile summary"
-        title="What we are about to run"
+        title="Review what will shape your list"
         lede={
           hardCount === 0
-            ? 'You have set no hard limits, so nothing will be removed outright: every option will be ranked instead.'
-            : `${hardCount} hard limit${hardCount > 1 ? 's' : ''} can remove options and block your final list. Everything else only changes the order.`
+            ? 'You set no hard limits, so every matching option can be ranked.'
+            : `${hardCount} hard limit${hardCount > 1 ? 's' : ''} can remove options. Everything else only changes their order.`
         }
         actions={
           <button type="button" className="btn btn--sm" onClick={() => goTo('profile')}>
@@ -83,7 +83,7 @@ export function ProfileSummary() {
             disabled={!valid || busy === 'generate'}
             onClick={generate}
           >
-            {busy === 'generate' ? 'Preparing strategy…' : 'Generate strategy'}
+            {busy === 'generate' ? 'Building your list…' : 'Generate strategy'}
           </button>
         </div>
       </section>
@@ -91,14 +91,14 @@ export function ProfileSummary() {
       <Band
         num="01"
         title="Candidate"
-        note="These determine which seat pools and closing ranks can apply to you."
+        note="Check your counselling, rank, category and region before continuing."
       >
         <dl className="summary-grid">
           <div className="summary-cell">
             <dt>Counselling</dt>
             <dd>
               {authority.label}
-              <small>{authority.datasetLabel}</small>
+              <small>{authority.rounds} counselling rounds supported</small>
             </dd>
           </div>
           <div className="summary-cell">
@@ -129,7 +129,7 @@ export function ProfileSummary() {
               <small>
                 {quotaLabels.length === 0
                   ? 'Only the standard category and region pools apply'
-                  : `${quotaLabels.join(' · ')}: eligibility is recorded for ${authority.label}; availability follows the source rows`}
+                  : `${quotaLabels.join(' · ')}. A quota is applied only where the selected counselling data includes it.`}
               </small>
             </dd>
           </div>
@@ -150,7 +150,7 @@ export function ProfileSummary() {
       <Band
         num="02"
         title="Hard limits"
-        note="These can remove an option outright and stop your list from locking until you deal with them."
+        note="Anything outside a hard limit is removed before your preference order is built."
       >
         <div className="band__head">
           <span className="section-label">Can block your list</span>
@@ -163,7 +163,7 @@ export function ProfileSummary() {
               {formatINRExact(profile.budget.value)}
               <small>
                 {profile.budget.mode === 'hard'
-                  ? 'Hard ceiling: over-budget options are flagged critical'
+                  ? 'Hard ceiling: over-budget options are removed before ranking'
                   : 'Soft preference: over-budget options only rank lower'}
               </small>
             </dd>
@@ -174,7 +174,7 @@ export function ProfileSummary() {
               {formatKm(profile.distance.value)}
               <small>
                 {profile.distance.mode === 'hard'
-                  ? 'Hard limit: further colleges are flagged critical'
+                  ? 'Hard limit: further colleges are removed before ranking'
                   : 'Soft preference: further colleges only rank lower'}
               </small>
             </dd>
@@ -221,7 +221,7 @@ export function ProfileSummary() {
         <NextStep
           tone="go"
           what="Generate my strategy"
-          why="We build the ordered list and run the first conflict audit in one pass. You can edit and re-audit as many times as you like."
+          why="Next, you will see the ranked list and any tradeoffs that need your decision. You can still edit and check it again."
         >
           <button type="button" className="btn" onClick={() => goTo('profile')}>
             Edit profile
@@ -232,7 +232,7 @@ export function ProfileSummary() {
             disabled={busy === 'generate'}
             onClick={generate}
           >
-            {busy === 'generate' ? 'Preparing strategy…' : 'Generate my strategy'}
+            {busy === 'generate' ? 'Building your list…' : 'Generate my strategy'}
           </button>
         </NextStep>
       ) : (

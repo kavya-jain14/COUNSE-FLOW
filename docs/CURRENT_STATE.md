@@ -1,19 +1,19 @@
 # Current state
 
-Last updated: 2026-08-22
+Last updated: 2026-09-07
 
 ## Repository
 
 - Remote: `https://github.com/kavya-jain14/COUNSEL-FLOW`
 - Remote default branch: `main`
-- Latest main checkpoint integrated through GitHub: `164235b`
+- Latest audited main base: `d116e83` (`feat: make counselling flow attention-first`).
 - PR #5 merged the frontend contract adapter.
 - PR #6 merged named rank-buffer strategy rules and boundary tests.
 - PR #8 merged domicile, sub-quota, home-city and exclusion-id contract fixes.
 - PR #9 merged the final strategy-item contract bug fix.
 - PR #10 merged multi-authority datasets, round progression and the deterministic
   candidate decision-impact evaluator.
-- Active UI branch: `feat/calm-scholar-ui`, created from latest `main`.
+- Active quality branch: `fix/devils-advocate-ux`, created from latest `main`.
 
 ## Locked product decisions
 
@@ -35,14 +35,42 @@ Last updated: 2026-08-22
   column card layout, colored edge treatments, rounded surfaces and decorative glyphs are
   not exposed in the Calm Scholar layer.
 
-## Calm Scholar UI checkpoint
+## Devil's-advocate quality pass
 
-- Replaced the dark SaaS skin with a document-driven admissions dossier system.
-- Palette is limited to soft sky blue, deep navy, warm paper, crisp off-white and beige.
-- Libre Baskerville is the display face, IBM Plex Sans is the body face and IBM Plex Mono
-  is used for rank, fees, distance, codes and revisions.
-- The five-step sidebar is now a numbered document index with no icon library or decorative
-  completion marks.
+- Locked strategy, conflict and profile state is now genuinely immutable. The visible
+  What If, reorder, remove, re-audit and conflict controls are unavailable after filing,
+  matching the reducer's safety boundary.
+- Generate, re-audit and lock operations carry an operation token. A response is ignored
+  if the candidate changes their profile or counselling while the request is in flight.
+- Applying a What If profile now regenerates from the proposed values instead of the
+  previous React render's profile.
+- Changing UPTAC, JoSAA or IPU clears the counselling-specific rank rather than silently
+  reusing it in another system.
+- Evidence gaps with the same missing facts are grouped into one explained decision.
+  The JoSAA reference run falls from 60 repeated evidence warnings to three grouped
+  decisions without hiding any affected option.
+- Delhi coordinates are included, so IPU distance limits are enforced rather than treating
+  every Delhi option as an unknown distance.
+- Generated and locked records cite the active authority dataset and reference round; they
+  no longer label JoSAA/IPU strategies as UPTAC.
+- Empty strategy copy distinguishes an unfinished profile from a valid run where no option
+  survives hard limits. The shared generate response permits this zero-result state, while
+  audit and lock requests still require a non-empty strategy.
+- Quota and hard-limit copy now describes current engine behavior accurately. Recorded
+  sub-quotas are not presented as applied seat pools unless a matching source row exists.
+- The previously standalone mock-engine test now runs under Vitest, and the root `check`
+  command includes all application tests.
+
+## Registrar Desk UI checkpoint
+
+- Replaced the fixed left sidebar with a full-width case-file masthead and horizontal
+  five-step route, returning the full viewport width to the candidate's work.
+- Palette now uses registrar ink, muted petrol, cool docket, warm paper and archive beige;
+  sky blue no longer fills the complete application frame.
+- Alegreya is the display face, Alegreya Sans is the body face and Azeret Mono is used for
+  rank, fees, distance, codes and revisions.
+- Current, completed, ready and future route states are written into each horizontal step;
+  no icon library or decorative completion marks are used.
 - Profile sections use ruled form bands; strategy and lock use flat registers; explanation
   content is marginalia; conflict decisions read as audit records.
 - Added a real landing specimen derived from the golden demo profile: seven surviving
@@ -53,19 +81,51 @@ Last updated: 2026-08-22
   decorative reorder arrows.
 - Added deployable privacy and terms notices linked from the landing document footer.
 - Updated every active brand asset to the Calm Scholar palette and typography.
-- The redesign is isolated in `src/styles/calm-scholar.css`; strategy, audit, lock and
-  contract behavior remain unchanged.
+- The visual redesign remains isolated in `src/styles/calm-scholar.css`; the shell change
+  does not alter strategy, audit, lock, contract or state behavior.
 - Full design notes: `design/CALM_SCHOLAR.md`.
+
+## Candidate-language UX cleanup
+
+- The horizontal route stays swipeable on narrow screens, hides the browser scrollbar,
+  and automatically centres the current step after navigation.
+- Removed the duplicate page breadcrumb and engine/version strip. The masthead and route
+  now provide one clear location, status and next-step signal.
+- Landing copy now tells candidates what to prepare and what the tool will do; internal
+  claims such as deterministic ordering are no longer used as product benefits.
+- Profile errors move focus to the first invalid field, while authority and quota guidance
+  uses certificate and counselling language instead of dataset terminology.
+- Strategy shows one attention queue, selects the first affected option and avoids repeating
+  the same warning totals in multiple bands.
+- Conflict actions use plain candidate language and keep the first unfinished decision in
+  focus. Saved-record identifiers remain available only inside a collapsed details section.
+- Lock focuses on the real next task: record the allotted seat and decide whether the next
+  round contains genuine improvements.
+- Native selects are replaced by one controlled keyboard and touch listbox across profile,
+  exclusions, branch add, What If and allotment flows.
+- Reservation checkboxes and range controls now use the same square registrar geometry,
+  ink contrast and focus treatment as the rest of the product.
+- Branch priority supports direct pointer/touch dragging plus Home, End and arrow-key
+  reordering. A single Remove action remains available without repeated Up/Down controls.
+- Conflict cards show the affected order and suggested result side by side. Detailed source
+  facts stay collapsed until a candidate asks for them.
+- Page and inspector scrolling remain functional while their native scrollbar indicators
+  are hidden. The desktop inspector remains sticky and independently scrollable; it stacks
+  below the list on narrower screens.
 
 ## Verification
 
 - Shared-contract TypeScript build: passed.
 - Root TypeScript `--noEmit`: passed.
-- Contract test suite: 14 passed, 0 failed.
-- Production Vite build: passed, 130 modules transformed.
+- Contract test suite: 15 passed, 0 failed.
+- Application test suite: 61 passed across 7 files.
+- Production Vite build: passed, 157 modules transformed.
 - Privacy and terms pages are included in the production output.
 - `git diff --check`: passed.
-- Golden engine and audit run: 7 options, 0 critical, 2 warnings (CF-01 and CF-08).
+- Golden UPTAC engine/audit run: 7 options, 0 critical, 2 warnings.
+- JoSAA audit-density run: 60 options, 3 grouped warnings instead of 60 evidence cards.
+- IPU hard-distance run: Lucknow to Delhi is measured; a 300 km hard limit correctly
+  produces no surviving Delhi options.
 - Responsive desktop/mobile rules are implemented at 900 px and 680 px.
 - The cloud browser cannot open this workspace's localhost preview, so the final screenshot
   pass must be done on Kavya's Mac before presentation.
@@ -75,9 +135,10 @@ Last updated: 2026-08-22
 ```bash
 git remote set-url origin https://github.com/kavya-jain14/COUNSEL-FLOW.git
 git fetch origin --prune
-git switch feat/calm-scholar-ui
+git switch fix/devils-advocate-ux
 npm ci
 npm run check
+npm run audit:runtime
 npm run dev
 ```
 

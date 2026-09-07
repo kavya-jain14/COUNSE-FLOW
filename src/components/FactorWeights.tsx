@@ -1,5 +1,6 @@
 import type { FactorKey, FactorWeights as Weights } from '../types'
 import { FACTORS, WEIGHT_WORDS } from '../data/reference'
+import { RangeInput } from './ui'
 
 export function FactorWeightSliders({
   weights,
@@ -32,16 +33,15 @@ export function FactorWeightSliders({
             </label>
             <span className="field__hint">{factor.hint}</span>
             <div className="slider-row">
-              <input
+              <RangeInput
                 id={id}
-                type="range"
                 min={0}
                 max={5}
                 step={1}
                 value={value}
-                aria-valuetext={`${WEIGHT_WORDS[value]} (${value} of 5)`}
-                onChange={(e) =>
-                  onChange({ ...weights, [factor.key as FactorKey]: Number(e.target.value) })
+                ariaValueText={`${WEIGHT_WORDS[value]} (${value} of 5)`}
+                onChange={(next) =>
+                  onChange({ ...weights, [factor.key as FactorKey]: next })
                 }
               />
               <output className="slider-value" htmlFor={id}>

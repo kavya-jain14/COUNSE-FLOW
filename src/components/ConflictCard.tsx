@@ -29,6 +29,36 @@ export function ConflictCard({
   const ordered = [...conflict.actions].sort((a, b) =>
     a.intent === b.intent ? 0 : a.intent === 'primary' ? -1 : 1,
   )
+  const suggested = ordered[0]
+  const affected = items
+    .filter((item) => conflict.itemIds.includes(item.itemId))
+    .sort((left, right) => left.position - right.position)
+  const visibleAffected = affected.slice(0, 4)
+  const remainingAffected = affected.length - visibleAffected.length
+  const basis = conflict.causedBy.includes('·')
+    ? conflict.causedBy.split('·').slice(1).join('·').trim()
+    : conflict.causedBy
+
+  const suggestedRows = (() => {
+    if (!suggested?.target) return null
+    if (suggested.kind === 'SWAP' && suggested.target.itemId && suggested.target.withItemId) {
+      const first = affected.find((item) => item.itemId === suggested.target?.itemId)
+      const second = affected.find((item) => item.itemId === suggested.target?.withItemId)
+      if (!first || !second) return null
+      return visibleAffected.map((item) => {
+        if (item.itemId === first.itemId) return { ...item, option: second.option }
+        if (item.itemId === second.itemId) return { ...item, option: first.option }
+        return item
+      })
+    }
+    if (
+      (suggested.kind === 'REMOVE_OPTION' || suggested.kind === 'DEDUPE') &&
+      suggested.target.itemId
+    ) {
+      return visibleAffected.filter((item) => item.itemId !== suggested.target?.itemId)
+    }
+    return null
+  })()
 
   function start(action: ConflictAction) {
     if (action.kind === 'SWAP' || action.requiresReason) {
@@ -69,7 +99,7 @@ export function ConflictCard({
       data-resolved={resolved}
       data-priority={priority}
       tabIndex={priority ? -1 : undefined}
-      aria-label={`${meta.label} conflict ${conflict.code}: ${conflict.title}`}
+      aria-label={`${meta.label} decision ${conflict.code}: ${conflict.title}`}
     >
       <header className="conflict__head">
         <div className="conflict__kicker">
@@ -80,19 +110,57 @@ export function ConflictCard({
         <h3 className="conflict__title">{conflict.title}</h3>
         <p className="conflict__summary">{conflict.summary}</p>
         <p className="conflict__caused">
-          <span className="mono" aria-hidden="true">Basis</span>
-          {conflict.causedBy}
+          <span className="mono">Checked against</span>
+          {basis}
         </p>
       </header>
 
-      <ul className="evidence">
-        <li className="sr-only">Evidence used for this flag:</li>
-        {conflict.evidence.map((line, i) => (
-          <li key={i}>
-            <span>{line}</span>
-          </li>
-        ))}
-      </ul>
+      <section className="conflict-glance" aria-label={`Current and suggested result for ${conflict.title}`}>
+        <div className="conflict-glance__side">
+          <span className="section-label">Right now</span>
+          {visibleAffected.length > 0 ? (
+            <ol>
+              {visibleAffected.map((item) => (
+                <li key={item.itemId}>
+                  <span className="mono">#{String(item.position).padStart(2, '0')}</span>
+                  <b>{item.option.collegeShort} · {item.option.branch}</b>
+                </li>
+              ))}
+              {remainingAffected > 0 && <li className="conflict-glance__more">+{remainingAffected} more affected</li>}
+            </ol>
+          ) : (
+            <p>{conflict.summary}</p>
+          )}
+        </div>
+
+        <div className="conflict-glance__side" data-result="true">
+          <span className="section-label">Suggested result</span>
+          {suggestedRows ? (
+            <ol>
+              {suggestedRows.map((item) => (
+                <li key={`${item.position}-${item.option.id}`}>
+                  <span className="mono">#{String(item.position).padStart(2, '0')}</span>
+                  <b>{item.option.collegeShort} · {item.option.branch}</b>
+                </li>
+              ))}
+              {remainingAffected > 0 && <li className="conflict-glance__more">+{remainingAffected} more stay visible</li>}
+            </ol>
+          ) : (
+            <p><b>{suggested?.label}</b><span>{suggested?.effect}</span></p>
+          )}
+        </div>
+      </section>
+
+      <details className="conflict-evidence">
+        <summary>
+          Show the {conflict.evidence.length} fact{conflict.evidence.length > 1 ? 's' : ''} used
+        </summary>
+        <ul className="evidence">
+          {conflict.evidence.map((line, index) => (
+            <li key={index}><span>{line}</span></li>
+          ))}
+        </ul>
+      </details>
 
       {resolved && resolution ? (
         <div className="resolved-note">
@@ -215,7 +283,7 @@ export function ConflictCard({
                 Your reason
               </label>
               <span className="field__hint">
-                This is stored with your locked list so the decision stays explainable later.
+                This stays with your saved list so you can remember why you kept the tradeoff.
               </span>
               <textarea
                 id={`reason-${conflict.id}`}
@@ -229,7 +297,7 @@ export function ConflictCard({
               {reasonInvalid && (
                 <span className="field__error" role="alert">
                   <span aria-hidden="true">Field</span>
-                  Write at least {MIN_REASON} characters so the override is understandable later.
+                  Write at least {MIN_REASON} characters so this choice is clear later.
                 </span>
               )}
             </div>

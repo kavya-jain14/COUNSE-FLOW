@@ -5,6 +5,7 @@ import { improvementsOver, labelFor } from '../lib/rounds'
 import { formatINRExact, formatKm } from '../lib/format'
 import { Band, Banner, NextStep, PageHead, TierBadge } from '../components/ui'
 import { DecisionImpactModal } from '../features/decision-impact'
+import { SelectMenu } from '../components/SelectMenu'
 
 export function Locked() {
   const { lock, items, resolutions, profile, authorityId, currentRound, allottedOptionId, history } =
@@ -15,9 +16,9 @@ export function Locked() {
   if (!lock) {
     return (
       <div className="card empty">
-        <p>No locked snapshot exists yet.</p>
+        <p>No final list has been saved yet.</p>
         <button className="btn btn--primary" onClick={() => goTo('conflicts')}>
-          Return to conflict inspector
+          Return to decisions
         </button>
       </div>
     )
@@ -36,18 +37,18 @@ export function Locked() {
       <PageHead
         step={5}
         total={5}
-        kicker="Locked"
-        title="Your list is locked"
-        lede={`${items.length} choices, in this order, with zero unresolved decisions. Everything below is reproducible from the snapshot.`}
+        kicker="Final list"
+        title="Your preference order is saved"
+        lede={`${items.length} choices are ready to fill in this order. Every required decision has been completed.`}
         actions={
           <button type="button" className="btn btn--sm" onClick={() => goTo('conflicts')}>
-            Back to inspector
+            Back to decisions
           </button>
         }
       />
 
-      <Banner tone="success" title="Snapshot saved" live>
-        <span className="mono">{lock.snapshotId}</span>
+      <Banner tone="success" title="Your final order is now read-only" live>
+        <span>Record each allotment below when the counselling round result arrives.</span>
       </Banner>
 
       <section className="locked-brief" aria-labelledby="locked-brief-title">
@@ -71,8 +72,8 @@ export function Locked() {
       <div style={{ marginTop: 34 }}>
         <Band
           num={`${items.length} choices`}
-          title="Locked preference order"
-          note="This is the order to fill in. Positions are final unless you start a new profile. Open any row to re-read what that choice means for your profile."
+          title="Final preference order"
+          note="Fill choices in this exact order. Open a row whenever you want to revisit why it fits your profile."
         >
           <div className="ledger">
             <div className="ledger__head" aria-hidden="true">
@@ -124,12 +125,19 @@ export function Locked() {
           </div>
         </Band>
 
-        <Band
-          num="Provenance"
-          title="How to reproduce this"
-          note="Same profile, same dataset, same engine version gives the same list."
-        >
+        <details className="record-details">
+          <summary>Saved record details</summary>
+          <p>
+            These technical details identify exactly which profile and counselling data created
+            this list. You normally do not need them while filling choices.
+          </p>
           <dl className="summary-grid">
+            <div className="summary-cell">
+              <dt>Record ID</dt>
+              <dd className="mono" style={{ fontSize: '0.9rem' }}>
+                {lock.snapshotId}
+              </dd>
+            </div>
             <div className="summary-cell">
               <dt>Profile revision</dt>
               <dd className="mono" style={{ fontSize: '0.9rem' }}>
@@ -171,7 +179,7 @@ export function Locked() {
               <dd>{overrides.length}</dd>
             </div>
           </dl>
-        </Band>
+        </details>
 
         {overrides.length > 0 && (
           <Band
@@ -187,10 +195,7 @@ export function Locked() {
                     <b>
                       {r.code} · {r.actionLabel}
                     </b>
-                    <p>
-                      {r.kind === 'OVERRIDDEN' ? 'Overridden' : 'Acknowledged'} at audit run #
-                      {r.atAuditRun}
-                    </p>
+                    <p>{r.kind === 'OVERRIDDEN' ? 'Kept with a reason' : 'Acknowledged'} during final review</p>
                     {r.reason && <q>{r.reason}</q>}
                   </span>
                 </li>
@@ -210,19 +215,18 @@ export function Locked() {
             <label className="field__label" htmlFor="allotment">
               Seat allotted in round {currentRound}
             </label>
-            <select
+            <SelectMenu
               id="allotment"
-              className="select"
               value={allottedOptionId ?? ''}
-              onChange={(e) => recordAllotment(e.target.value || null)}
-            >
-              <option value="">Not allotted anything yet</option>
-              {items.map((item) => (
-                <option key={item.itemId} value={item.option.id}>
-                  #{String(item.position).padStart(2, '0')}: {labelFor(item)}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: '', label: 'Not allotted anything yet' },
+                ...items.map((item) => ({
+                  value: item.option.id,
+                  label: `#${String(item.position).padStart(2, '0')}: ${labelFor(item)}`,
+                })),
+              ]}
+              onChange={(next) => recordAllotment(next || null)}
+            />
           </div>
 
           {heldItem && (
@@ -236,7 +240,7 @@ export function Locked() {
             >
               <span>
                 {preview.exhausted
-                  ? 'Freezing is the rational move. Floating can only get you something you ranked lower.'
+                  ? 'Choose Freeze if you want to keep this seat. Floating cannot improve it within this list.'
                   : `You were allotted ${labelFor(heldItem)} at #${preview.heldPosition}. Round ${currentRound + 1} would carry only the ${preview.items.length} option${preview.items.length > 1 ? 's' : ''} above it; ${preview.droppedCount} would be dropped as no improvement.`}
               </span>
             </Banner>
@@ -247,7 +251,7 @@ export function Locked() {
           <Band
             num={`${history.length} done`}
             title="Rounds so far"
-            note="Each round keeps its own locked snapshot."
+            note="Each completed round keeps its own final list."
           >
             <ul className="activity">
               {history.map((h) => (
@@ -275,10 +279,10 @@ export function Locked() {
               ? 'Freeze: you already hold your best available option'
               : `Round ${authority.rounds} is the last round for ${authority.label}`
           }
-          why="Keep the snapshot ID. If the dataset or your circumstances change, start a new profile rather than editing this one."
+          why="If your rank, budget or circumstances change, start a new profile instead of editing this final list."
         >
           <button type="button" className="btn" onClick={() => goTo('conflicts')}>
-            Back to inspector
+            Back to decisions
           </button>
           <button type="button" className="btn btn--primary" onClick={reset}>
             Start a new profile
@@ -290,12 +294,12 @@ export function Locked() {
           what={`Build my round ${currentRound + 1} list`}
           why={
             allottedOptionId
-              ? 'We carry forward only the options you rank above the seat you hold, then re-audit them against your constraints.'
+              ? 'We carry forward only the options above the seat you hold, then check them against your limits again.'
               : 'Record your allotment first if you got one: otherwise the next round carries the full list forward.'
           }
         >
           <button type="button" className="btn" onClick={() => goTo('conflicts')}>
-            Back to inspector
+            Back to decisions
           </button>
           <button type="button" className="btn btn--primary" onClick={startNextRound}>
             Start round {currentRound + 1}

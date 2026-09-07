@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import type { ConstraintSetting } from '../types'
-import { HardSoftBadge } from './ui'
+import { HardSoftBadge, RangeInput } from './ui'
 
 export function ConstraintControl({
   label,
@@ -43,15 +43,15 @@ export function ConstraintControl({
         <span className="field__hint">{hint}</span>
 
         <div className="slider-row">
-          <input
+          <RangeInput
             id={id}
-            type="range"
             min={min}
             max={max}
             step={step}
             value={setting.value}
-            aria-describedby={`${id}-behaviour`}
-            onChange={(e) => onChange({ ...setting, value: Number(e.target.value) })}
+            ariaDescribedBy={`${id}-behaviour`}
+            ariaValueText={format(setting.value)}
+            onChange={(value) => onChange({ ...setting, value })}
           />
           <output className="slider-value" htmlFor={id}>
             {format(setting.value)}

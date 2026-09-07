@@ -198,8 +198,8 @@ export function StrategyInspector({
         </dl>
         {option.missingFacts.length > 0 && (
           <p className="band__note" style={{ marginTop: 10 }}>
-            Not scored: {option.missingFacts.join(', ')}: missing from the dataset, so it was
-            excluded rather than guessed.
+            Not used in ranking: {option.missingFacts.join(', ')} information is unavailable, so
+            CounselFlow did not guess it.
           </p>
         )}
       </div>

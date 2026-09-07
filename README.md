@@ -192,18 +192,20 @@ demo fix sequence converges to 0 critical / 0 warning / 1 info, then locks.
 
 ## Design system
 
-The active UI implements **CounselFlow Calm Scholar**, an admissions-dossier system built
-from deep navy, soft sky blue, warm paper and beige. It uses Libre Baskerville for display,
-IBM Plex Sans for body copy and IBM Plex Mono for ranks, fees, distance and revision data.
+The active UI implements **CounselFlow Registrar Desk**, an institutional case-file system
+built from registrar ink, muted petrol, cool docket, warm paper and archive beige. It uses
+Alegreya for display, Alegreya Sans for body copy and Azeret Mono for ranks, fees, distance
+and revision data.
 
 The complete specification is in [`design/CALM_SCHOLAR.md`](design/CALM_SCHOLAR.md). The
 active layer lives in [`src/styles/calm-scholar.css`](src/styles/calm-scholar.css) and is
 loaded after the legacy stylesheet, keeping the redesign isolated and reversible.
 
-The shell is a numbered five-section document index. Profile inputs sit in ruled sections,
-the strategy and locked list are registers, explanations appear as marginalia, and conflict
-decisions read as an audit record. The interface uses no gradients, shadows, glass, emoji,
-decorative icon library, soft cards, purple-black palette or decorative checkmark lists.
+The shell uses a full-width case-file masthead and horizontal five-step route instead of a
+fixed left sidebar. Profile inputs sit in ruled sections, the strategy and locked list are
+registers, explanations appear as marginalia, and conflict decisions read as an audit
+record. The interface uses no gradients, shadows, glass, emoji, decorative icon library,
+soft cards, purple-black palette or decorative checkmark lists.
 
 ## Accessibility
 

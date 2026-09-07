@@ -5,7 +5,8 @@ import { BRANCHES, BRANCH_LABELS } from '../data/reference'
 import { MAX_BUDGET, MAX_DISTANCE, MIN_BUDGET, MIN_DISTANCE } from '../lib/validation'
 import { formatINR, formatKm } from '../lib/format'
 import { applyLever, describeLever, runWhatIf, type LeverId } from '../lib/whatif'
-import { Dialog } from './ui'
+import { Dialog, RangeInput } from './ui'
+import { SelectMenu } from './SelectMenu'
 
 const LEVERS: Array<{ id: LeverId; label: string; blurb: string }> = [
   { id: 'distance', label: 'Distance limit', blurb: 'How far you would go' },
@@ -69,8 +70,8 @@ export function WhatIfPanel({
   return (
     <Dialog title="What if you changed one thing?" onClose={onClose}>
       <p className="card__hint">
-        Nothing here touches your saved profile until you apply it. The same engine that built
-        your list rebuilds it here.
+        Nothing changes until you apply it. Use this preview to compare the new order with your
+        current list.
       </p>
 
       <div className="whatif__levers" role="tablist" aria-label="Preference to test">
@@ -94,57 +95,52 @@ export function WhatIfPanel({
         {lever === 'distance' && (
           <label className="field">
             <span className="field__label">Distance limit: {formatKm(Number(value))}</span>
-            <input
-              type="range"
+            <RangeInput
               min={MIN_DISTANCE}
               max={MAX_DISTANCE}
               step={10}
               value={Number(value)}
-              onChange={(e) => setValue(Number(e.target.value))}
+              onChange={setValue}
             />
           </label>
         )}
         {lever === 'budget' && (
           <label className="field">
             <span className="field__label">Annual budget: {formatINR(Number(value))}</span>
-            <input
-              type="range"
+            <RangeInput
               min={MIN_BUDGET}
               max={MAX_BUDGET}
               step={5000}
               value={Number(value)}
-              onChange={(e) => setValue(Number(e.target.value))}
+              onChange={setValue}
             />
           </label>
         )}
         {lever === 'placements' && (
           <label className="field">
             <span className="field__label">Placement weight: {value} of 5</span>
-            <input
-              type="range"
+            <RangeInput
               min={0}
               max={5}
               step={1}
               value={Number(value)}
-              onChange={(e) => setValue(Number(e.target.value))}
+              onChange={setValue}
             />
           </label>
         )}
         {lever === 'branchTop' && (
-          <label className="field">
+          <div className="field">
             <span className="field__label">Put this branch first</span>
-            <select
-              className="select"
+            <SelectMenu
               value={String(value)}
-              onChange={(e) => setValue(e.target.value)}
-            >
-              {BRANCHES.map((b) => (
-                <option key={b} value={b}>
-                  {b}: {BRANCH_LABELS[b]}
-                </option>
-              ))}
-            </select>
-          </label>
+              ariaLabel="Put this branch first"
+              options={BRANCHES.map((branch) => ({
+                value: branch,
+                label: `${branch}: ${BRANCH_LABELS[branch]}`,
+              }))}
+              onChange={setValue}
+            />
+          </div>
         )}
         {(lever === 'budgetMode' || lever === 'distanceMode') && (
           <div className="segmented" role="radiogroup" aria-label="Treat as">

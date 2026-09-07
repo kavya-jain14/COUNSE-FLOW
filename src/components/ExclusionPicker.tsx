@@ -7,6 +7,7 @@ import {
   INSTITUTE_TYPE_LABELS,
 } from '../data/reference'
 import { Field } from './ui'
+import { SelectMenu } from './SelectMenu'
 
 const KINDS: Array<{ kind: HardExclusionKind; label: string }> = [
   { kind: 'branch', label: 'A branch' },
@@ -98,46 +99,27 @@ export function ExclusionPicker({
       )}
 
       <div className="row" style={{ marginTop: value.length ? 10 : 0 }}>
-        <label className="sr-only" htmlFor="exclusion-kind">
-          Type of exclusion
-        </label>
-        <select
+        <SelectMenu
           id="exclusion-kind"
-          className="select"
           style={{ maxWidth: 210 }}
           value={kind}
-          onChange={(e) => {
-            setKind(e.target.value as HardExclusionKind)
+          ariaLabel="Type of exclusion"
+          options={KINDS.map((entry) => ({ value: entry.kind, label: entry.label }))}
+          onChange={(next) => {
+            setKind(next as HardExclusionKind)
             setPick('')
           }}
-        >
-          {KINDS.map((k) => (
-            <option key={k.kind} value={k.kind}>
-              {k.label}
-            </option>
-          ))}
-        </select>
+        />
 
         {kind !== 'noHostel' && (
-          <>
-            <label className="sr-only" htmlFor="exclusion-value">
-              Value to exclude
-            </label>
-            <select
-              id="exclusion-value"
-              className="select"
-              style={{ maxWidth: 280 }}
-              value={pick}
-              onChange={(e) => setPick(e.target.value)}
-            >
-              <option value="">Choose…</option>
-              {options.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </>
+          <SelectMenu
+            id="exclusion-value"
+            style={{ maxWidth: 280 }}
+            value={pick}
+            ariaLabel="Value to exclude"
+            options={[{ value: '', label: 'Choose…' }, ...options]}
+            onChange={setPick}
+          />
         )}
 
         <button type="button" className="btn btn--sm" disabled={!canAdd} onClick={add}>
