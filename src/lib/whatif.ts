@@ -4,6 +4,7 @@ import { BRANCH_LABELS } from '../data/reference'
 import { formatINR, formatKm } from './format'
 
 export type LeverId =
+  | 'rank'
   | 'distance'
   | 'budget'
   | 'placements'
@@ -24,12 +25,19 @@ export interface MovedItem {
   to: number
 }
 
+export interface RetieredItem {
+  item: StrategyItem
+  from: StrategyItem['tier']
+  to: StrategyItem['tier']
+}
+
 export interface WhatIfResult {
   before: StrategyItem[]
   after: StrategyItem[]
   entered: StrategyItem[]
   dropped: StrategyItem[]
   moved: MovedItem[]
+  retiered: RetieredItem[]
   explanation: string
 }
 
@@ -53,6 +61,9 @@ export function applyLever(
   }
 
   switch (lever) {
+    case 'rank':
+      next.rank = Math.max(1, Math.min(2_000_000, Math.round(Number(value))))
+      break
     case 'distance':
       next.distance.value = Number(value)
       break
@@ -83,6 +94,13 @@ export function describeLever(
   value: number | string,
 ): WhatIfChange {
   switch (lever) {
+    case 'rank':
+      return {
+        lever,
+        label: 'Rank',
+        from: profile.rank == null ? 'Not entered' : profile.rank.toLocaleString('en-IN'),
+        to: Math.max(1, Math.round(Number(value))).toLocaleString('en-IN'),
+      }
     case 'distance':
       return {
         lever,
@@ -122,7 +140,7 @@ export function describeLever(
       return {
         lever,
         label: 'Top branch',
-        from: profile.branchPriority[0] ?? '—',
+        from: profile.branchPriority[0] ?? 'Not set',
         to: String(value),
       }
   }
@@ -145,14 +163,15 @@ function explain(
   entered: StrategyItem[],
   dropped: StrategyItem[],
   moved: MovedItem[],
+  retiered: RetieredItem[],
   beforeCount: number,
   afterCount: number,
 ): string {
   const delta = afterCount - beforeCount
   const head = `Changing ${change.label.toLowerCase()} from ${change.from} to ${change.to}`
 
-  if (entered.length === 0 && dropped.length === 0 && moved.length === 0) {
-    return `${head} changes nothing — your list is already stable against that.`
+  if (entered.length === 0 && dropped.length === 0 && moved.length === 0 && retiered.length === 0) {
+    return `${head} changes nothing. Your list is already stable against that scenario.`
   }
 
   const parts: string[] = []
@@ -176,6 +195,12 @@ function explain(
     parts.push(`and reorders ${moved.length} more`)
   }
 
+  if (retiered.length > 0) {
+    parts.push(
+      `${parts.length > 0 ? 'and ' : ''}changes the reach band for ${retiered.length} option${retiered.length > 1 ? 's' : ''}`,
+    )
+  }
+
   return `${head} ${parts.join(', ')}.`
 }
 
@@ -195,10 +220,14 @@ export function runWhatIf(
   const entered = after.filter((i) => !beforeKeys.has(keyOf(i)))
   const dropped = before.filter((i) => !afterKeys.has(keyOf(i)))
   const moved: MovedItem[] = []
+  const retiered: RetieredItem[] = []
   for (const item of after) {
     const prev = beforeKeys.get(keyOf(item))
     if (prev && prev.position !== item.position) {
       moved.push({ item, from: prev.position, to: item.position })
+    }
+    if (prev && prev.tier !== item.tier) {
+      retiered.push({ item, from: prev.tier, to: item.tier })
     }
   }
   moved.sort((a, b) => Math.abs(b.from - b.to) - Math.abs(a.from - a.to))
@@ -210,6 +239,7 @@ export function runWhatIf(
     entered,
     dropped,
     moved,
-    explanation: explain(change, entered, dropped, moved, before.length, after.length),
+    retiered,
+    explanation: explain(change, entered, dropped, moved, retiered, before.length, after.length),
   }
 }

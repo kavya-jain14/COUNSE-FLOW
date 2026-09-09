@@ -128,7 +128,7 @@ export function Strategy() {
               onClick={() => setWhatIfOpen(true)}
               disabled={items.length === 0}
             >
-              What if?
+              Try a scenario
             </button>
           </>
         )}
@@ -210,7 +210,7 @@ export function Strategy() {
             <ol className="ledger__list">
               {items.map((item) => (
                 <StrategyRow
-                  key={item.itemId}
+                  key={`${item.itemId}-${item.position}`}
                   item={item}
                   conflicts={byItem[item.itemId] ?? []}
                   fit={fits[item.itemId]}
@@ -232,6 +232,7 @@ export function Strategy() {
           item={selected}
           conflicts={selected ? (byItem[selected.itemId] ?? []) : []}
           profile={profile}
+          authorityId={authorityId}
           total={items.length}
           disabled={busy != null || Boolean(snapshot)}
           onMove={moveItem}

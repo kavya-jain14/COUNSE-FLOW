@@ -17,6 +17,10 @@ Only this family is used:
 | Archive beige | `#E5DDD0` | Table heads, decision notes, hard-limit fields |
 | Desk canvas | `#E8ECEB` | Workspace background between records |
 
+Limit-use meters alone add a restrained semantic ramp: archive green `#537565`, ochre
+`#A37B3F` and brick `#8F4B3F`. It communicates consumed headroom, never status or admission
+probability, and always appears with a written numeric value.
+
 Severity is communicated with words, codes, line weight, and border style. It does not
 introduce red, amber, green, purple, or rainbow status colors.
 
@@ -45,26 +49,32 @@ the data face with tabular numerals.
   dataset identifiers are reserved for a collapsed saved-record details section.
 - Selects use a shared listbox with explicit `SELECT` / `CLOSE` labels, keyboard navigation
   and touch-sized options. Native browser chrome is not part of the active interface.
-- Range controls show a solid ink-filled track and square double-rule thumb without using
-  gradients. Quota checkboxes use a matching square ink mark.
+- Range controls show a solid ink-filled track and square double-rule thumb. Fee and
+  distance headroom use one proportional threshold ramp so approaching a declared limit
+  can be read at a glance. Quota checkboxes use a matching square ink mark.
 - Branch order is directly draggable on pointer and touch devices, while the same grip
   supports arrow, Home and End keys.
 - Conflict records lead with a two-part current/suggested comparison; verbose evidence is
   disclosed only on request.
+- Scenario Lab compares the current register and a non-destructive alternate in two ruled
+  columns. Locked registers keep the same comparison available without an apply action.
+- Closing-rank sparklines appear only for two or more comparable, imported cycles; absent
+  years remain absent.
 
 ## Explicit exclusions
 
-The UI does not use gradients, shadows, glass effects, decorative icon libraries, emoji,
-testimonials, pricing patterns, bento grids, dot fields, radial shapes, neon, purple-black
-themes, oversized rounded corners, or decorative checkmark lists. Motion is disabled in
-the visual layer.
+The UI does not use decorative or background gradients, shadows, glass effects, decorative
+icon libraries, emoji, testimonials, pricing patterns, bento grids, dot fields, radial
+shapes, neon, purple-black themes, oversized rounded corners, or decorative checkmark
+lists. The only gradient is the functional limit-use meter. Motion is reserved for the
+170 ms row-settle feedback after a manual reorder and is disabled for reduced-motion users.
 
 ## Final acceptance gate
 
 - The candidate shell exposes only the five product steps. The integration lab remains a
   development file and has no candidate-facing navigation.
-- The active stylesheet forces flat backgrounds, square geometry, static hover states,
-  zero blur, zero shadow and zero decorative animation.
+- The active stylesheet forces flat document backgrounds, square geometry, static hover
+  states, zero blur, zero shadow and zero decorative animation.
 - Reorder controls use written labels instead of an icon library or decorative arrows.
 - Loading states use plain status copy instead of a spinner or skeleton surface.
 - The landing page contains a real seven-row product specimen with two reproducible audit
@@ -74,6 +84,8 @@ the visual layer.
 - Privacy and terms links open complete, deployable notices using the same palette and type
   system.
 - Brand SVGs remain monochrome and use the approved Registrar Desk palette.
+- Scenario previews never mutate the current or locked strategy without an explicit apply
+  action, and portable exports reproduce the immutable order in full.
 
 ## Implementation boundary
 

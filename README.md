@@ -137,6 +137,19 @@ Fix → re-audit → lock is a real gate, not a decoration:
 - the locked snapshot records profile / dataset / engine version, every fix, and every
   override reason
 
+**4. Scenario Lab and offline register**
+
+What If is a real, non-destructive planning mode rather than a static explanation. A
+candidate can test a rank 500 better or worse, relax a hard budget or distance rule, or
+change another declared preference. CounselFlow re-runs the deterministic engine and
+shows current and alternate lists side by side, including entered, dropped, reordered and
+reach-band changes. The current plan changes only after an explicit apply action; locked
+plans are compare-only.
+
+The locked list can be downloaded as a complete PNG or printed/saved as a PDF for offline
+use. The inspector shows historical closing-rank movement only when two or more comparable
+imported cycles exist. Missing years are never estimated.
+
 ---
 
 ## Contracts to freeze with the team
@@ -204,8 +217,10 @@ loaded after the legacy stylesheet, keeping the redesign isolated and reversible
 The shell uses a full-width case-file masthead and horizontal five-step route instead of a
 fixed left sidebar. Profile inputs sit in ruled sections, the strategy and locked list are
 registers, explanations appear as marginalia, and conflict decisions read as an audit
-record. The interface uses no gradients, shadows, glass, emoji, decorative icon library,
-soft cards, purple-black palette or decorative checkmark lists.
+record. The interface uses no decorative/background gradients, shadows, glass, emoji,
+decorative icon library, soft cards, purple-black palette or decorative checkmark lists.
+A single functional threshold ramp is reserved for consumed budget/distance limits, and
+brief row motion confirms a manual reorder while respecting reduced-motion preferences.
 
 ## Accessibility
 

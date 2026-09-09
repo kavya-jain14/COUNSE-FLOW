@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useAppActions, useAppState } from '../state/store'
 import { AUTHORITIES } from '../data/authorities'
 import { improvementsOver, labelFor } from '../lib/rounds'
@@ -6,12 +6,28 @@ import { formatINRExact, formatKm } from '../lib/format'
 import { Band, Banner, NextStep, PageHead, TierBadge } from '../components/ui'
 import { DecisionImpactModal } from '../features/decision-impact'
 import { SelectMenu } from '../components/SelectMenu'
+import { WhatIfPanel } from '../components/WhatIfPanel'
+import { LockedExportSheet } from '../components/LockedExportSheet'
+import { downloadLockedListPng, printLockedList } from '../lib/lockedExport'
+import { latestSetFor } from '../data/generated'
+import { CUTOFF_YEAR } from '../data/cutoffs'
 
 export function Locked() {
   const { lock, items, resolutions, profile, authorityId, currentRound, allottedOptionId, history } =
     useAppState()
   const { goTo, reset, recordAllotment, startNextRound } = useAppActions()
   const [impactId, setImpactId] = useState<string | null>(null)
+  const [whatIfOpen, setWhatIfOpen] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportStatus, setExportStatus] = useState('')
+  const engineContext = useMemo(() => {
+    const set = latestSetFor(authorityId)
+    return {
+      authority: authorityId,
+      year: set?.year ?? CUTOFF_YEAR,
+      round: set?.round ?? 1,
+    }
+  }, [authorityId])
 
   if (!lock) {
     return (
@@ -24,6 +40,7 @@ export function Locked() {
     )
   }
 
+  const lockedRecord = lock
   const overrides = lock.acknowledgedWarnings
   const fixes = resolutions.filter((r) => r.kind === 'FIXED')
   const authority = AUTHORITIES[authorityId]
@@ -31,6 +48,24 @@ export function Locked() {
   const preview = improvementsOver(items, allottedOptionId)
   const heldItem = items.find((it) => it.option.id === allottedOptionId) ?? null
   const impactItem = items.find((it) => it.itemId === impactId) ?? null
+  async function exportPng() {
+    setExporting(true)
+    setExportStatus('Preparing image…')
+    try {
+      await downloadLockedListPng({
+        authorityLabel: authority.label,
+        round: currentRound,
+        profile,
+        items,
+        lock: lockedRecord,
+      })
+      setExportStatus('PNG downloaded.')
+    } catch (error) {
+      setExportStatus(error instanceof Error ? error.message : 'The image could not be downloaded.')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <>
@@ -41,11 +76,24 @@ export function Locked() {
         title="Your preference order is saved"
         lede={`${items.length} choices are ready to fill in this order. Every required decision has been completed.`}
         actions={
-          <button type="button" className="btn btn--sm" onClick={() => goTo('conflicts')}>
-            Back to decisions
-          </button>
+          <div className="locked-head-actions">
+            <button type="button" className="btn btn--sm" onClick={() => setWhatIfOpen(true)}>
+              Compare alternate
+            </button>
+            <button type="button" className="btn btn--sm" onClick={printLockedList}>
+              Print / save PDF
+            </button>
+            <button type="button" className="btn btn--sm" onClick={() => void exportPng()} disabled={exporting}>
+              {exporting ? 'Preparing…' : 'Download PNG'}
+            </button>
+            <button type="button" className="btn btn--sm" onClick={() => goTo('conflicts')}>
+              Back to decisions
+            </button>
+          </div>
         }
       />
+
+      <span className="sr-only" role="status" aria-live="polite">{exportStatus}</span>
 
       <Banner tone="success" title="Your final order is now read-only" live>
         <span>Record each allotment below when the counselling round result arrives.</span>
@@ -316,6 +364,23 @@ export function Locked() {
           onClose={() => setImpactId(null)}
         />
       )}
+
+      {whatIfOpen && (
+        <WhatIfPanel
+          profile={profile}
+          items={items}
+          context={engineContext}
+          onClose={() => setWhatIfOpen(false)}
+        />
+      )}
+
+      <LockedExportSheet
+        authority={authority}
+        round={currentRound}
+        profile={profile}
+        items={items}
+        lock={lockedRecord}
+      />
     </>
   )
 }

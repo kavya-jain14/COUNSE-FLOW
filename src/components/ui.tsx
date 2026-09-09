@@ -211,11 +211,13 @@ export function Dialog({
   onClose,
   children,
   footer,
+  className,
 }: {
   title: string
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
+  className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const titleId = useId()
@@ -264,7 +266,13 @@ export function Dialog({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={ref}>
+      <div
+        className={`dialog${className ? ` ${className}` : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        ref={ref}
+      >
         <h2 id={titleId}>{title}</h2>
         {children}
         {footer && <div className="row row--between">{footer}</div>}
@@ -379,15 +387,24 @@ export function Meter({
   detail,
   polarity,
   fill,
+  scale = 'plain',
+  annotation = false,
 }: {
   label: string
   value: string
   detail?: string
   polarity: 'positive' | 'negative' | 'neutral'
   fill: number
+  scale?: 'plain' | 'limit'
+  annotation?: boolean
 }) {
   return (
-    <div className="meter" data-polarity={polarity}>
+    <div
+      className="meter"
+      data-polarity={polarity}
+      data-scale={scale}
+      data-annotation={annotation || undefined}
+    >
       <div className="meter__top">
         <span className="meter__label">{label}</span>
         <span className="meter__value">{value}</span>
