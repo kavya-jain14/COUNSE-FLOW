@@ -1,6 +1,6 @@
 # Current state
 
-Last updated: 2026-09-07
+Last updated: 2026-09-09
 
 ## Repository
 
@@ -13,7 +13,9 @@ Last updated: 2026-09-07
 - PR #9 merged the final strategy-item contract bug fix.
 - PR #10 merged multi-authority datasets, round progression and the deterministic
   candidate decision-impact evaluator.
-- Active quality branch: `fix/devils-advocate-ux`, created from latest `main`.
+- Active quality PR: `fix/devils-advocate-ux`, created from latest `main`.
+- Scenario Lab is isolated on `feat/scenario-lab` and stacks on the quality PR until
+  that prerequisite is merged.
 
 ## Locked product decisions
 
@@ -113,13 +115,38 @@ Last updated: 2026-09-07
   are hidden. The desktop inspector remains sticky and independently scrollable; it stacks
   below the list on narrower screens.
 
+## Scenario Lab and portable plan
+
+- What If is now a visible Scenario Lab. It opens on a useful 500-rank improvement,
+  supports 500/1,000-rank nudges, rank entry, budget and distance changes, hard/soft rule
+  changes, placement weight and top-branch changes.
+- Every scenario re-runs the same deterministic strategy engine and compares the current
+  and alternate top seven side by side. Entered, dropped, reordered and reach-band changes
+  are counted separately.
+- A scenario is non-destructive: the current profile and strategy remain untouched until
+  the candidate explicitly chooses `Use this scenario`. A locked list can be compared but
+  never replaced.
+- A locked preference register can be downloaded as a full PNG or printed/saved as PDF.
+  Both exports include the exact order, rank, round, timestamp, snapshot, dataset and
+  evidence year for offline use at a counselling centre.
+- The strategy inspector draws a compact closing-rank trend only when at least two real,
+  comparable imported cycles exist. JoSAA rows can show 2024 and 2025; single-cycle UPTAC
+  and IPU evidence is labelled as insufficient instead of being extrapolated.
+- Fee and distance meters now show the proportion of each declared limit already used,
+  with a restrained green-to-amber-to-red threshold ramp. The numeric headroom remains the
+  primary accessible signal.
+- Manual list movement uses a short positional settle animation. Reduced-motion settings
+  disable it. A very subtle paper grain reinforces the filed-document identity without
+  reducing text contrast.
+
 ## Verification
 
 - Shared-contract TypeScript build: passed.
 - Root TypeScript `--noEmit`: passed.
 - Contract test suite: 15 passed, 0 failed.
-- Application test suite: 61 passed across 7 files.
-- Production Vite build: passed, 157 modules transformed.
+- Application test suite: 67 passed across 9 files.
+- Rank scenarios and imported-history integrity have dedicated regression tests.
+- Production Vite build: passed.
 - Privacy and terms pages are included in the production output.
 - `git diff --check`: passed.
 - Golden UPTAC engine/audit run: 7 options, 0 critical, 2 warnings.
@@ -135,7 +162,7 @@ Last updated: 2026-09-07
 ```bash
 git remote set-url origin https://github.com/kavya-jain14/COUNSEL-FLOW.git
 git fetch origin --prune
-git switch fix/devils-advocate-ux
+git switch feat/scenario-lab
 npm ci
 npm run check
 npm run audit:runtime

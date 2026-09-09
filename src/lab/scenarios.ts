@@ -156,4 +156,19 @@ export const LAB_SCENARIOS: readonly LabScenario[] = [
     expectedConflictCodes: [],
     expectedLockBlocked: false,
   },
+  {
+    id: 'rank-scenario-is-non-destructive',
+    title: 'A rank scenario is compared before it replaces the current plan',
+    proves:
+      'Scenario Lab re-runs the deterministic engine and exposes list and reach-band differences without silently editing the saved order.',
+    setup: [
+      'Generate the UPTAC sample strategy with rank 12500.',
+      'Open Scenario Lab and choose 500 worse. Confirm IET Lucknow IT changes reach band in the side-by-side comparison.',
+      'Close the comparison and confirm rank 12500 and the current order are unchanged.',
+      'Open it again, use the scenario, and confirm the profile changes before a new list is generated.',
+      'On a locked list, compare the alternate and confirm there is no apply control.',
+    ],
+    expectedConflictCodes: [],
+    expectedLockBlocked: false,
+  },
 ] as const

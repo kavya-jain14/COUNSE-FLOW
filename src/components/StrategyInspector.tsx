@@ -1,7 +1,10 @@
 import type { CandidateProfile, Conflict, StrategyItem, Tier } from '../types'
 import { INSTITUTE_TYPE_LABELS } from '../data/reference'
+import { candidatePools, type AuthorityId } from '../data/authorities'
+import { generatedClosingRankHistory } from '../data/generated'
 import { formatINRExact, formatKm, formatRank } from '../lib/format'
 import { Meter, SeverityBadge } from './ui'
+import { ClosingRankTrend } from './ClosingRankTrend'
 
 const TIER_LEDE: Record<Tier, string> = {
   DREAM: 'Closed ≥10% above your rank last cycle (closing rank < 90% of yours). A stretch: worth keeping near the top, because a good year costs you nothing to try.',
@@ -26,6 +29,7 @@ export function StrategyInspector({
   item,
   conflicts,
   profile,
+  authorityId,
   total,
   disabled,
   onMove,
@@ -36,6 +40,7 @@ export function StrategyInspector({
   item: StrategyItem | null
   conflicts: Conflict[]
   profile: CandidateProfile
+  authorityId: AuthorityId
   total: number
   disabled?: boolean
   onMove: (itemId: string, direction: -1 | 1) => void
@@ -63,6 +68,17 @@ export function StrategyInspector({
     option.annualFee == null ? null : profile.budget.value - option.annualFee
   const distanceHeadroom =
     option.distanceKm == null ? null : profile.distance.value - option.distanceKm
+  const importedHistory = generatedClosingRankHistory(
+    authorityId,
+    option.id,
+    profile.category && profile.domicile
+      ? candidatePools(authorityId, profile.category, profile.domicile)
+      : [],
+  )
+  const history =
+    importedHistory.length > 0 || option.closingRank == null
+      ? importedHistory
+      : [{ year: option.sourceYear, round: null, closingRank: option.closingRank }]
 
   return (
     <aside className="rail" aria-label={`Why ${name} is at position ${item.position}`}>
@@ -127,7 +143,9 @@ export function StrategyInspector({
               profile.budget.value,
             )} ${profile.budget.mode === 'hard' ? 'ceiling' : 'preference'}.`}
             polarity={feeHeadroom < 0 ? 'negative' : feeHeadroom > profile.budget.value * 0.15 ? 'positive' : 'neutral'}
-            fill={clamp01(feeHeadroom / profile.budget.value)}
+            fill={clamp01((option.annualFee ?? 0) / profile.budget.value)}
+            scale="limit"
+            annotation
           />
         )}
 
@@ -143,7 +161,9 @@ export function StrategyInspector({
               profile.distance.value,
             )} ${profile.distance.mode === 'hard' ? 'limit' : 'preference'}.`}
             polarity={distanceHeadroom < 0 ? 'negative' : 'positive'}
-            fill={clamp01(distanceHeadroom / profile.distance.value)}
+            fill={clamp01((option.distanceKm ?? 0) / profile.distance.value)}
+            scale="limit"
+            annotation
           />
         )}
 
@@ -196,6 +216,7 @@ export function StrategyInspector({
             {option.sourceLabel} {option.sourceYear}
           </dd>
         </dl>
+        {option.closingRank != null && <ClosingRankTrend points={history} />}
         {option.missingFacts.length > 0 && (
           <p className="band__note" style={{ marginTop: 10 }}>
             Not used in ranking: {option.missingFacts.join(', ')} information is unavailable, so

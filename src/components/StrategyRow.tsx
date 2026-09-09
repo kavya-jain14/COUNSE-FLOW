@@ -33,7 +33,12 @@ export function StrategyRow({
   const name = `${option.collegeShort} · ${option.branch}`
 
   return (
-    <li className="lrow-wrap" data-flagged={worst?.severity} data-attention={Boolean(worst)}>
+    <li
+      className="lrow-wrap"
+      data-flagged={worst?.severity}
+      data-attention={Boolean(worst)}
+      data-manually-placed={item.manuallyPlaced || undefined}
+    >
       <button
         type="button"
         className="lrow"
